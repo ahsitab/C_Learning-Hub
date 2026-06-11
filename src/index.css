@@ -1,0 +1,181 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Dark Mode (Default) */
+  --bg-color: #0a0a0f;
+  --surface-bg: #12121a;
+  --surface-card: #1a1a2e;
+  --surface-hover: #1e1e35;
+  --surface-border: #2a2a45;
+
+  --text-gray-100: #f3f4f6;
+  --text-gray-200: #e5e7eb;
+  --text-gray-300: #d1d5db;
+  --text-gray-400: #9ca3af;
+  --text-gray-500: #6b7280;
+  --text-gray-600: #4b5563;
+
+  --logo-text-color: #ffffff;
+  --grid-opacity: 0.03;
+  --shadow-glow: 0 0 30px rgba(99, 102, 241, 0.15);
+  --shadow-glow-sm: 0 0 15px rgba(99, 102, 241, 0.1);
+}
+
+[data-theme="light"] {
+  /* Light Mode */
+  --bg-color: #f8fafc;
+  --surface-bg: #ffffff;
+  --surface-card: #ffffff;
+  --surface-hover: #f1f5f9;
+  --surface-border: #cbd5e1;
+
+  --text-gray-100: #0f172a;
+  --text-gray-200: #1e293b;
+  --text-gray-300: #334155;
+  --text-gray-400: #475569;
+  --text-gray-500: #64748b;
+  --text-gray-600: #94a3b8;
+
+  --logo-text-color: #4f46e5;
+  --grid-opacity: 0.2;
+  --shadow-glow: 0 10px 30px rgba(99, 102, 241, 0.06);
+  --shadow-glow-sm: 0 4px 15px rgba(99, 102, 241, 0.05);
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-gray-300);
+    @apply font-sans antialiased;
+    min-height: 100vh;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: var(--bg-color);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-surface-border rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-indigo-500/50;
+  }
+
+  ::selection {
+    @apply bg-indigo-500/30 text-white;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-surface-card border border-surface-border rounded-2xl backdrop-blur-sm;
+  }
+
+  .glass-card-hover {
+    @apply glass-card transition-all duration-300 hover:border-indigo-500/40 hover:shadow-glow hover:-translate-y-1;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-indigo-400 via-violet-400 to-cyan-400 bg-clip-text text-transparent;
+  }
+
+  .btn-primary {
+    @apply bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500
+           text-white font-semibold px-6 py-3 rounded-xl transition-all duration-300
+           hover:shadow-glow hover:-translate-y-0.5 active:translate-y-0;
+  }
+
+  .btn-secondary {
+    @apply bg-surface-card border border-surface-border hover:border-indigo-500/50
+           text-gray-300 hover:text-white font-medium px-6 py-3 rounded-xl
+           transition-all duration-300 hover:bg-surface-hover;
+  }
+
+  .tab-active {
+    @apply bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-glow-sm;
+  }
+
+  .tab-inactive {
+    @apply text-gray-400 hover:text-white hover:bg-surface-hover;
+  }
+
+  .callout-info {
+    @apply border-l-4 border-blue-500 bg-blue-500/10 rounded-r-xl p-4;
+  }
+
+  .callout-tip {
+    @apply border-l-4 border-emerald-500 bg-emerald-500/10 rounded-r-xl p-4;
+  }
+
+  .callout-warning {
+    @apply border-l-4 border-amber-500 bg-amber-500/10 rounded-r-xl p-4;
+  }
+
+  .callout-syntax {
+    @apply border-l-4 border-violet-500 bg-violet-500/10 rounded-r-xl p-4;
+  }
+
+  .sidebar-item {
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200
+           text-gray-400 hover:text-gray-100 hover:bg-surface-hover cursor-pointer;
+  }
+
+  .sidebar-item-active {
+    @apply bg-indigo-500/10 text-indigo-500 border border-indigo-500/30;
+  }
+
+  .difficulty-easy {
+    @apply bg-emerald-500/20 text-emerald-400 border border-emerald-500/30;
+  }
+
+  .difficulty-medium {
+    @apply bg-amber-500/20 text-amber-400 border border-amber-500/30;
+  }
+
+  .difficulty-hard {
+    @apply bg-rose-500/20 text-rose-400 border border-rose-500/30;
+  }
+}
+
+@layer utilities {
+  .animate-delay-100 { animation-delay: 100ms; }
+  .animate-delay-200 { animation-delay: 200ms; }
+  .animate-delay-300 { animation-delay: 300ms; }
+  .animate-delay-400 { animation-delay: 400ms; }
+  .animate-delay-500 { animation-delay: 500ms; }
+
+  .bg-grid {
+    background-image: linear-gradient(rgba(99,102,241,var(--grid-opacity)) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(99,102,241,var(--grid-opacity)) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .glow-indigo {
+    box-shadow: 0 0 40px rgba(99,102,241,0.2);
+  }
+
+  .glow-violet {
+    box-shadow: 0 0 40px rgba(139,92,246,0.2);
+  }
+}
