@@ -9,6 +9,7 @@ import SearchModal from "./components/search/SearchModal";
 import HomePage from "./pages/HomePage";
 import TopicPage from "./pages/TopicPage";
 import LabExercisesPage from "./pages/LabExercisesPage";
+import CompilerPage from "./pages/CompilerPage";
 import NotFoundPage from "./pages/NotFoundPage";
 
 export default function App() {
@@ -84,6 +85,10 @@ export default function App() {
               <Route
                 path="/lab-solutions"
                 element={<LabExercisesPage progressApi={progressApi} />}
+              />
+              <Route
+                path="/compiler"
+                element={<CompilerPage />}
               />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>

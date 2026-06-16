@@ -80,6 +80,16 @@ export default function Navbar({ topics, progressApi, theme, onToggleTheme, onOp
           <span>Lab Exercises</span>
         </Link>
 
+        {/* Compiler Navigation Link */}
+        <Link
+          to="/compiler"
+          id="nav-compiler-btn"
+          className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium text-gray-400 hover:text-gray-100 hover:bg-surface-hover transition-all duration-200"
+        >
+          <span>💻</span>
+          <span>Online Compiler</span>
+        </Link>
+
         {/* Progress indicator */}
         <div className="hidden sm:flex items-center gap-3">
           <div className="flex flex-col items-end">

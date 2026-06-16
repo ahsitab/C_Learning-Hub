@@ -79,6 +79,23 @@ export default function Sidebar({ topics, progressApi, isOpen, isMobile, onClose
             </p>
           </div>
         </Link>
+
+        {/* Compiler Sidebar Link */}
+        <Link
+          to="/compiler"
+          onClick={onClose}
+          id="sidebar-compiler"
+          className={`sidebar-item ${location.pathname === "/compiler" ? "sidebar-item-active" : ""}`}
+        >
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center text-base flex-shrink-0 bg-violet-500/10 text-violet-500">
+            💻
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className={`text-sm font-medium truncate ${location.pathname === "/compiler" ? "text-violet-500" : "text-gray-300"}`}>
+              Online Compiler
+            </p>
+          </div>
+        </Link>
       </div>
 
       {/* Footer progress */}
