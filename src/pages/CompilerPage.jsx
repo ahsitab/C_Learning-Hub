@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { Link, useLocation } from "react-router-dom";
 
 const TEMPLATES = [
   {
@@ -69,7 +69,34 @@ int main() {
 ];
 
 export default function CompilerPage() {
+  const location = useLocation();
+  const iframeRef = useRef(null);
+  const [isIframeLoaded, setIsIframeLoaded] = useState(false);
   const [copiedId, setCopiedId] = useState(null);
+
+  const initialCode = location.state?.code || "";
+
+  const populateCodeInEditor = (codeText) => {
+    if (iframeRef.current) {
+      iframeRef.current.contentWindow.postMessage(
+        {
+          eventType: "populateCode",
+          language: "c",
+          code: codeText,
+        },
+        "*"
+      );
+    }
+  };
+
+  useEffect(() => {
+    if (isIframeLoaded && initialCode) {
+      const timer = setTimeout(() => {
+        populateCodeInEditor(initialCode);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isIframeLoaded, initialCode]);
 
   const handleCopy = (id, code) => {
     navigator.clipboard.writeText(code);
@@ -116,32 +143,26 @@ export default function CompilerPage() {
                   key={tpl.id}
                   className="p-4 bg-surface-card border border-surface-border rounded-xl hover:border-indigo-500/30 transition-all duration-200"
                 >
-                  <div className="flex justify-between items-start gap-2 mb-2">
+                  <div className="flex justify-between items-center gap-2 mb-2">
                     <h3 className="text-sm font-bold text-gray-200">{tpl.title}</h3>
-                    <button
-                      onClick={() => handleCopy(tpl.id, tpl.code)}
-                      className={`text-xs font-semibold px-2.5 py-1 rounded-lg border transition-all duration-200 flex items-center gap-1.5 ${
-                        copiedId === tpl.id
-                          ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                          : "bg-surface-hover text-gray-400 border-surface-border hover:text-white hover:border-gray-500"
-                      }`}
-                    >
-                      {copiedId === tpl.id ? (
-                        <>
-                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                          </svg>
-                          <span>Copied!</span>
-                        </>
-                      ) : (
-                        <>
-                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m-6 4h6m-6 4h6" />
-                          </svg>
-                          <span>Copy</span>
-                        </>
-                      )}
-                    </button>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={() => populateCodeInEditor(tpl.code)}
+                        className="text-[11px] font-semibold px-2 py-0.5 rounded bg-indigo-600/15 text-indigo-400 hover:bg-indigo-600 hover:text-white transition-all duration-150"
+                      >
+                        Load
+                      </button>
+                      <button
+                        onClick={() => handleCopy(tpl.id, tpl.code)}
+                        className={`text-[11px] font-semibold px-2 py-0.5 rounded border transition-all duration-150 ${
+                          copiedId === tpl.id
+                            ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                            : "bg-surface-hover text-gray-400 border-surface-border hover:text-white"
+                        }`}
+                      >
+                        {copiedId === tpl.id ? "Copied!" : "Copy"}
+                      </button>
+                    </div>
                   </div>
                   <p className="text-xs text-gray-400 leading-relaxed mb-3">{tpl.description}</p>
                   <pre className="text-[10px] font-mono p-2.5 bg-black/40 border border-surface-border/50 rounded-lg text-indigo-300 overflow-x-auto max-h-32 select-all">
@@ -170,6 +191,8 @@ export default function CompilerPage() {
         <div className="lg:col-span-2 flex flex-col h-full min-h-[600px]">
           <div className="glass-card p-1.5 flex-1 flex flex-col overflow-hidden border-indigo-500/15 shadow-glow-sm">
             <iframe
+              ref={iframeRef}
+              onLoad={() => setIsIframeLoaded(true)}
               src="https://onecompiler.com/embed/c?theme=dark&hideLanguageSelection=true"
               title="Online C Compiler"
               className="w-full h-[650px] rounded-xl border-0 bg-[#0d0d18]"

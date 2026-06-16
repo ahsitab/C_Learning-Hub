@@ -96,6 +96,23 @@ export default function Sidebar({ topics, progressApi, isOpen, isMobile, onClose
             </p>
           </div>
         </Link>
+
+        {/* Mini Projects Sidebar Link */}
+        <Link
+          to="/mini-projects"
+          onClick={onClose}
+          id="sidebar-mini-projects"
+          className={`sidebar-item ${location.pathname === "/mini-projects" ? "sidebar-item-active" : ""}`}
+        >
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center text-base flex-shrink-0 bg-emerald-500/10 text-emerald-500">
+            📁
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className={`text-sm font-medium truncate ${location.pathname === "/mini-projects" ? "text-emerald-500" : "text-gray-300"}`}>
+              Mini Projects
+            </p>
+          </div>
+        </Link>
       </div>
 
       {/* Footer progress */}
