@@ -15,38 +15,82 @@ export const topic11to15 = [
           id: "s11-1",
           heading: "What is a String?",
           type: "definition",
-          content: "In C, a string is a 1-D array of characters terminated by a null character `\\0`.",
+          content: "In C, there is **no built-in string type**. Strings are represented as **1D arrays of `char`** terminated by the **null character `'\\0'`** (ASCII value 0). This sentinel character marks the end of the string and is crucial — without it, string functions don't know where to stop.",
+          code: `// 'Hello' is stored as: H e l l o \0
+// Index:                   0 1 2 3 4  5
+char str[6] = "Hello"; // Needs 6 bytes (5 chars + 1 null)`
         },
         {
           id: "s11-2",
-          heading: "Declaration and Initialization",
-          type: "syntax",
-          content: "You can initialize strings using string literals or character arrays.",
-          code: `char str1[] = "Hello"; // Compiler adds '\\0' automatically
-char str2[6] = {'H', 'e', 'l', 'l', 'o', '\\0'};`
+          heading: "String Memory Layout",
+          type: "concept",
+          content: "Understanding how strings live in memory is essential for avoiding bugs:",
+          table: {
+            headers: ["Index", "0", "1", "2", "3", "4", "5"],
+            rows: [
+              ["Character", "'H'", "'e'", "'l'", "'l'", "'o'", "'\\0'"],
+              ["ASCII", "72", "101", "108", "108", "111", "0"]
+            ]
+          }
         },
         {
           id: "s11-3",
-          heading: "String Input/Output",
+          heading: "Declaration & Initialization",
           type: "syntax",
-          content: "Use `%s` format specifier. For reading strings with spaces, `fgets` is preferred over `scanf`.",
-          code: `char name[50];
-// scanf stops reading at the first space
-// scanf("%s", name);
+          content: "There are multiple ways to declare strings, each with subtle differences:",
+          code: `// Method 1: String literal (compiler auto-adds \\0)
+char str1[] = "Hello"; // Size = 6
 
-// fgets reads the whole line including spaces
-fgets(name, sizeof(name), stdin);
-printf("Hello %s", name);`
+// Method 2: Explicit character array
+char str2[6] = {'H', 'e', 'l', 'l', 'o', '\\0'};
+
+// Method 3: Declare with max size (common for input)
+char name[50]; // Can hold up to 49 characters + \\0
+
+// IMPORTANT: Pointer vs Array strings
+char *p = "Hello"; // String literal in read-only memory - cannot modify!
+char arr[] = "Hello"; // Mutable copy on the stack - can modify`
         },
         {
           id: "s11-4",
-          heading: "String Functions (<string.h>)",
+          heading: "String Input & Output",
+          type: "syntax",
+          content: "Choosing the right input function is critical:",
+          table: {
+            headers: ["Function", "Usage", "Stops at", "Safe?"],
+            rows: [
+              [`scanf("%s", str)`, "Read word", "Whitespace (space, newline)", "Risk of overflow"],
+              [`fgets(str, size, stdin)`, "Read line", "Newline or size-1 chars", "Yes (preferred)"],
+              [`printf("%s", str)`, "Print string", "Until '\\0'", "Yes"],
+              [`puts(str)`, "Print string + newline", "Until '\\0'", "Yes"]
+            ]
+          },
+          code: `char city[50];
+
+// scanf: fast but STOPS at spaces!
+scanf("%s", city); // "New York" would only store "New"
+
+// fgets: reads the ENTIRE line (including spaces)
+fgets(city, sizeof(city), stdin); // "New York" stored correctly
+// Note: fgets includes the '\n' at the end - strip it if needed:
+city[strcspn(city, "\\n")] = '\\0';`
+        },
+        {
+          id: "s11-5",
+          heading: "String Library Functions (<string.h>)",
           type: "concept",
-          content: "Common functions: `strlen` (length), `strcpy` (copy), `strcat` (concatenate), `strcmp` (compare).",
-          code: `#include <string.h>
-char str[20] = "Apple";
-int len = strlen(str); // 5
-strcpy(str, "Banana"); // Copies Banana into str`
+          content: "The `<string.h>` library provides powerful string manipulation functions. Always include it when using these.",
+          table: {
+            headers: ["Function", "Purpose", "Example", "Returns"],
+            rows: [
+              ["strlen(s)", "Length of string (not counting \\0)", `strlen("Hello")`, "5"],
+              ["strcpy(dst, src)", "Copy src into dst", `strcpy(name, "Alice")`, "Pointer to dst"],
+              ["strcat(dst, src)", "Append src to end of dst", `strcat(str, " World")`, "Pointer to dst"],
+              ["strcmp(s1, s2)", "Compare strings lexicographically", `strcmp("abc", "abd")`, "0=equal, <0=s1 first, >0=s2 first"],
+              ["strchr(s, c)", "Find first occurrence of char c", `strchr("Hello", 'l')`, "Pointer to 'l', or NULL"],
+              ["strstr(s, sub)", "Find substring in string", `strstr("Hello World", "World")`, "Pointer to match, or NULL"]
+            ]
+          }
         }
       ]
     },
@@ -149,30 +193,90 @@ strcpy(str, "Banana"); // Copies Banana into str`
       sections: [
         {
           id: "s12-1",
-          heading: "What is a Function?",
+          heading: "What is a Function & Why Use Them?",
           type: "definition",
-          content: "A function is a block of code that performs a specific task. It provides reusability and modularity.",
+          content: "A **function** is a self-contained, named block of code that performs a specific task. Functions are the fundamental building block of structured programming.\n\n**Why functions are critical:**\n- **DRY Principle**: Don't Repeat Yourself. Write once, call many times.\n- **Readability**: A well-named function (`calculateTax()`) tells you exactly what it does.\n- **Debugging**: Isolate bugs to a single function.\n- **Teamwork**: Different programmers can write different functions.",
         },
         {
           id: "s12-2",
-          heading: "Function Syntax",
+          heading: "Anatomy of a Function",
           type: "syntax",
-          content: "A function has a return type, name, parameters, and a body. A prototype declares the function before it's used.",
-          code: `// Prototype
+          content: "Every function has four components:",
+          code: `// 1. Prototype (declaration): Tells the compiler the function exists
+//    Must appear BEFORE it's called
 int add(int a, int b);
 
-// Definition
-int add(int a, int b) {
-    return a + b;
+// 2. Definition: The actual implementation
+int add(int a, int b) {   // Return type + Name + Parameters
+    return a + b;          // Return statement
+}
+
+// 3. Call: How you use the function
+int result = add(5, 3); // result = 8
+
+// Void functions don't return a value:
+void printLine() {
+    printf("----------\\n");
+    // No return statement needed
 }`
         },
         {
           id: "s12-3",
-          heading: "Pass by Value",
+          heading: "The Call Stack — How Functions Work in Memory",
           type: "concept",
-          content: "By default, arguments are passed by value in C. The function gets a copy of the variable, so changes inside the function don't affect the original variable.",
-          code: `void modify(int x) {
-    x = 10; // Changes local copy only
+          content: "When a function is called, the program creates a **stack frame** (a block of memory) for that function's local variables and parameters. When the function returns, the frame is destroyed. This is why local variables don't exist outside their function.",
+          table: {
+            headers: ["Stack at moment of call: add(5, 3)"],
+            rows: [
+              ["Frame: main()    | result (waiting)"],
+              ["Frame: add()     | a=5, b=3, [computes 8]"],
+              ["↓ add() returns 8, its stack frame is destroyed"],
+              ["Frame: main()    | result = 8"]
+            ]
+          }
+        },
+        {
+          id: "s12-4",
+          heading: "Pass by Value — The Default Behavior",
+          type: "concept",
+          content: "In C, function arguments are passed **by value**. This means the function receives a **copy** of the variable, not the original. Any changes made inside the function do NOT affect the original variable.",
+          code: `void double_it(int x) {
+    x = x * 2; // Modifies local copy ONLY
+    printf("Inside: %d\\n", x); // 10
+}
+
+int main() {
+    int n = 5;
+    double_it(n);
+    printf("Outside: %d\\n", n); // Still 5! Original unchanged.
+    return 0;
+}
+// To modify the original, you must use POINTERS (Pass by Reference - Topic 13)`
+        },
+        {
+          id: "s12-5",
+          heading: "Scope: Local vs Global Variables",
+          type: "concept",
+          content: "**Scope** defines where a variable is accessible.",
+          table: {
+            headers: ["Variable Type", "Declared", "Accessible From", "Lifetime"],
+            rows: [
+              ["Local", "Inside a function", "Only within that function", "Created when function is called, destroyed when it returns"],
+              ["Global", "Outside all functions", "All functions in the file", "Entire program lifetime"],
+              ["Parameter", "In function signature", "Only within that function", "Same as local"]
+            ]
+          },
+          code: `int globalVar = 100; // Global: accessible everywhere
+
+void myFunc() {
+    int localVar = 50; // Local: only exists inside myFunc
+    printf("%d %d\\n", globalVar, localVar); // Both accessible here
+}
+
+int main() {
+    printf("%d\\n", globalVar); // OK
+    // printf("%d", localVar); // ERROR: localVar is out of scope!
+    return 0;
 }`
         }
       ]
@@ -275,38 +379,86 @@ int add(int a, int b) {
       sections: [
         {
           id: "s13-1",
-          heading: "What is a Pointer?",
+          heading: "What is a Pointer? (The Core Concept)",
           type: "definition",
-          content: "A pointer is a variable that stores the memory address of another variable.",
+          content: "Every variable in a C program occupies a specific address in RAM. A **pointer** is a special variable that stores that **memory address** as its value.\n\nThink of RAM as a city: every byte is a house with a unique street address. A normal variable stores data IN the house. A pointer stores the ADDRESS of the house.",
+          code: `int x = 42;         // A variable: a house with the value 42
+                        // Stored at address, say, 2000
+int *ptr = &x;      // A pointer: stores the address 2000
+
+printf("%d",   x);   // 42 (value of x)
+printf("%p",  &x);   // 0x7d0 (2000 in hex) - address of x
+printf("%p", ptr);   // 0x7d0 - same address stored in ptr
+printf("%d", *ptr);  // 42 - dereferencing: 'go to the address and read the value'`
         },
         {
           id: "s13-2",
-          heading: "Syntax",
+          heading: "Declaration, Address-of (&) & Dereference (*)",
           type: "syntax",
-          content: "Use `*` to declare a pointer and `&` to get the address of a variable.",
-          code: `int x = 10;
-int *ptr = &x; // ptr holds address of x
-printf("%d", *ptr); // Dereferencing: prints 10`
+          content: "The two key pointer operators:",
+          table: {
+            headers: ["Operator", "Name", "Usage", "Meaning"],
+            rows: [
+              ["&", "Address-of", "&variable", "Gets the memory address of the variable"],
+              ["*", "Dereference", "*pointer", "Goes to the address and reads/writes the value there"],
+              ["*", "Pointer declaration", "int *ptr", "Declares 'ptr' as a pointer to int"]
+            ]
+          },
+          code: `int score = 95;
+int *p = &score; // p points to score
+
+printf("Value via pointer: %d\\n", *p); // 95
+
+*p = 100; // Modify score's value THROUGH the pointer
+printf("score is now: %d\\n", score); // 100 - score was changed!`
         },
         {
           id: "s13-3",
-          heading: "Pointers and Arrays",
+          heading: "Pointer Arithmetic",
           type: "concept",
-          content: "The name of an array is actually a pointer to its first element.",
+          content: "When you add 1 to a pointer, it advances by the **size of the type** it points to (e.g., `int*` advances by 4 bytes). This makes pointer arithmetic ideal for traversing arrays.",
           code: `int arr[3] = {10, 20, 30};
-int *p = arr; // Same as p = &arr[0]
-printf("%d", *(p+1)); // Prints 20 (arr[1])`
+int *p = arr; // p points to arr[0] at address 1000
+
+printf("%d", *p);       // 10 (arr[0])
+printf("%d", *(p + 1)); // 20 (arr[1], at address 1004)
+printf("%d", *(p + 2)); // 30 (arr[2], at address 1008)
+
+// These are IDENTICAL to using array indexing:
+// arr[1] == *(arr + 1) == *(p + 1)   All mean the same thing!`
         },
         {
           id: "s13-4",
-          heading: "Pass by Reference",
+          heading: "Pass by Reference with Pointers",
           type: "example",
-          content: "Use pointers to pass arguments by reference so functions can modify the original variables.",
+          content: "To let a function **modify the caller's variable**, pass the address of the variable (using `&`). The function receives the pointer and uses `*` to access and modify the actual value.",
           code: `void swap(int *a, int *b) {
-    int temp = *a;
-    *a = *b;
-    *b = temp;
+    int temp = *a;  // Read value at address a
+    *a = *b;        // Write value of b into address a
+    *b = temp;      // Write temp into address b
+}
+
+int main() {
+    int x = 5, y = 10;
+    swap(&x, &y); // Pass ADDRESSES, not values
+    printf("%d %d\\n", x, y); // 10 5 - actually swapped!
+    return 0;
 }`
+        },
+        {
+          id: "s13-5",
+          heading: "Common Pointer Mistakes",
+          type: "concept",
+          content: "Pointers are powerful but dangerous. Understand these common bugs:",
+          table: {
+            headers: ["Mistake", "Code Example", "Problem"],
+            rows: [
+              ["Uninitialized pointer", "int *p; *p = 5;", "p points to random memory - crashes or corrupts data"],
+              ["NULL pointer dereference", "int *p = NULL; *p = 5;", "Segmentation fault - program crashes"],
+              ["Memory leak", "int *p = malloc(4); (no free)", "Memory is allocated but never released"],
+              ["Dangling pointer", "free(p); *p = 5;", "Accessing freed memory - undefined behavior"]
+            ]
+          }
         }
       ]
     },
@@ -408,34 +560,94 @@ printf("%d", *(p+1)); // Prints 20 (arr[1])`
       sections: [
         {
           id: "s14-1",
-          heading: "What is a Structure?",
+          heading: "What is a Structure & Why?",
           type: "definition",
-          content: "A structure (`struct`) is a user-defined data type that groups related variables of different types.",
+          content: "A **structure (`struct`)** is a user-defined data type that groups related variables of **different types** under a single name.\n\n**The problem it solves**: To store a student's data (name, roll, marks, GPA), you'd need 4 separate variables. For 50 students, that's 200 variables! A struct bundles them together, and you can create arrays of structs.",
+          code: `// Define the template (blueprint)
+struct Student {
+    int roll;       // 4 bytes
+    char name[50];  // 50 bytes
+    float gpa;      // 4 bytes
+}; // Total size = ~58 bytes (with possible padding)
+
+// Declare variables of this type
+struct Student s1, s2;
+struct Student class[100]; // Array of 100 students!`
         },
         {
           id: "s14-2",
-          heading: "Defining and Using a Struct",
+          heading: "Accessing Members with the Dot Operator",
           type: "syntax",
-          content: "Define the struct, then declare variables of that type. Access members using the dot (`.`) operator.",
+          content: "Use the **dot operator (`.`)** to access members of a struct variable. Use **assignment** for initialization.",
           code: `struct Student {
-    int id;
+    int roll;
+    char name[50];
     float gpa;
 };
 
-int main() {
-    struct Student s1;
-    s1.id = 101;
-    s1.gpa = 3.8;
-}`
+struct Student s1;
+s1.roll = 101;
+strcpy(s1.name, "Alice"); // Use strcpy for strings!
+s1.gpa = 3.95;
+
+printf("%d %s %.2f\\n", s1.roll, s1.name, s1.gpa);
+
+// Initialize at declaration:
+struct Student s2 = {102, "Bob", 3.7};`
         },
         {
           id: "s14-3",
           heading: "Array of Structures",
           type: "concept",
-          content: "You can create an array where each element is a structure, perfect for storing lists of records.",
-          code: `struct Student class[50];
-class[0].id = 1;
-class[0].gpa = 3.9;`
+          content: "The most powerful application of structs is creating arrays of them, allowing you to store and manage lists of records (like a database table).",
+          code: `struct Student class[3] = {
+    {1, "Alice", 3.9},
+    {2, "Bob",   3.5},
+    {3, "Carol", 3.8}
+};
+
+// Find the top student:
+float maxGPA = class[0].gpa;
+int topIdx = 0;
+for (int i = 1; i < 3; i++) {
+    if (class[i].gpa > maxGPA) {
+        maxGPA = class[i].gpa;
+        topIdx = i;
+    }
+}
+printf("Top: %s with GPA %.2f\\n", class[topIdx].name, maxGPA);`
+        },
+        {
+          id: "s14-4",
+          heading: "struct vs union — Key Difference",
+          type: "concept",
+          content: "Both `struct` and `union` group members, but they differ in memory usage:",
+          table: {
+            headers: ["Feature", "struct", "union"],
+            rows: [
+              ["Memory", "Each member gets its OWN memory", "ALL members SHARE the same memory"],
+              ["Size", "Sum of all member sizes (+ padding)", "Size of the LARGEST member"],
+              ["Usage", "Store MULTIPLE values at once", "Store only ONE value at a time"],
+              ["Use case", "Student records, points, shapes", "Type-agnostic data, protocol headers"]
+            ]
+          }
+        },
+        {
+          id: "s14-5",
+          heading: "typedef — Creating Shorter Names",
+          type: "syntax",
+          content: "Using `typedef` lets you create an alias for a struct, so you don't need to type `struct` every time.",
+          code: `// Without typedef: must write 'struct Student' everywhere
+struct Student { int id; float gpa; };
+struct Student s1;
+
+// With typedef: just write 'Student'
+typedef struct {
+    int id;
+    float gpa;
+} Student;
+
+Student s1; // Much cleaner!`
         }
       ]
     },
@@ -536,31 +748,90 @@ class[0].gpa = 3.9;`
       sections: [
         {
           id: "s15-1",
-          heading: "Passing Struct by Value",
-          type: "syntax",
-          content: "You can pass an entire structure to a function. A copy is created.",
-          code: `void printStudent(struct Student s) {
-    printf("%d", s.id);
-}`
+          heading: "Why Pass Structs to Functions?",
+          type: "definition",
+          content: "Functions can work with structures just like any other data type. This allows you to build cleaner APIs where each function handles one aspect of a struct (e.g., `printEmployee()`, `giveRaise()`, `createPoint()`).",
         },
         {
           id: "s15-2",
-          heading: "Passing Struct by Reference",
+          heading: "Passing by Value (Copy)",
           type: "syntax",
-          content: "To modify a structure or avoid copying large amounts of data, pass a pointer to the structure. Use the arrow operator `->` to access members.",
-          code: `void updateGPA(struct Student *s, float newGpa) {
-    s->gpa = newGpa; // Arrow operator used with pointers
+          content: "When a struct is passed **by value**, the function gets a **complete copy**. Changes inside the function do not affect the original. This is simple but potentially **slow for large structs** (copying every field).",
+          code: `struct Student {
+    int roll;
+    float gpa;
+};
+
+void print(struct Student s) {
+    s.gpa = 0; // Modifies LOCAL copy only!
+    printf("Roll: %d, GPA: %.2f\\n", s.roll, s.gpa);
+}
+
+int main() {
+    struct Student me = {101, 3.9};
+    print(me);
+    printf("GPA still: %.2f\\n", me.gpa); // Still 3.9 - unchanged!
 }`
         },
         {
           id: "s15-3",
-          heading: "Returning Structures",
+          heading: "Passing by Reference (Pointer) — The Arrow Operator",
+          type: "syntax",
+          content: "When passing a **pointer to a struct**, you use the **arrow operator (`->`)** to access members. This is efficient (no copying) and allows the function to **modify the original struct**.",
+          code: `void giveRaise(struct Employee *e, int amount) {
+    e->salary += amount; // Arrow operator: same as (*e).salary
+    // (*e).salary is verbose - arrow (->) is the shorthand
+}
+
+int main() {
+    struct Employee emp = {1, 50000};
+    giveRaise(&emp, 5000); // Pass address
+    printf("New salary: %d\\n", emp.salary); // 55000 - modified!
+}`
+        },
+        {
+          id: "s15-4",
+          heading: "Dot vs Arrow — When to Use Which",
           type: "concept",
-          content: "Functions can also return structures.",
-          code: `struct Point createPoint(int x, int y) {
+          content: "This is a common point of confusion. The rule is simple:",
+          table: {
+            headers: ["You have", "To access member", "Use", "Example"],
+            rows: [
+              ["A struct variable", "Directly", "Dot (`.`)", "s.name, s.id"],
+              ["A pointer to a struct", "Via the pointer", "Arrow (`->`)", "p->name, p->id"],
+              ["A pointer to a struct", "Explicit dereference", "(*p).member", "(*p).name (equivalent to arrow)"]
+            ]
+          }
+        },
+        {
+          id: "s15-5",
+          heading: "Returning Structures from Functions",
+          type: "concept",
+          content: "Functions can also **return struct values**. This is very clean for 'factory' functions that create and initialize structs.",
+          code: `struct Point {
+    float x;
+    float y;
+};
+
+// Factory function: creates and returns a Point
+struct Point createPoint(float x, float y) {
     struct Point p;
-    p.x = x; p.y = y;
-    return p;
+    p.x = x;
+    p.y = y;
+    return p; // Returns the entire struct by value
+}
+
+// Calculate distance between two points
+float distance(struct Point *a, struct Point *b) {
+    float dx = b->x - a->x;
+    float dy = b->y - a->y;
+    return sqrt(dx*dx + dy*dy);
+}
+
+int main() {
+    struct Point p1 = createPoint(0, 0);
+    struct Point p2 = createPoint(3, 4);
+    printf("Distance: %.2f\\n", distance(&p1, &p2)); // 5.00
 }`
         }
       ]

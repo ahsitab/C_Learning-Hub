@@ -13,36 +13,79 @@ export const topic6to10 = [
       sections: [
         {
           id: "s6-1",
-          heading: "The while Loop",
-          type: "syntax",
-          content: "The `while` loop evaluates a condition before executing the code block. It is best used when you don't know exactly how many times the loop should run.",
-          code: `int i = 1;
-while (i <= 5) {
-    printf("%d ", i);
-    i++; // Remember to update the variable!
-}`
+          heading: "Why while and do-while?",
+          type: "definition",
+          content: "The `for` loop is ideal when you know **exactly** how many times to iterate. But what if you don't? For example:\n- Keep reading input until the user types -1 (you don't know how many inputs).\n- Keep trying to connect to a server until it succeeds.\n\nFor these cases, `while` and `do-while` loops are the correct tools.",
         },
         {
           id: "s6-2",
-          heading: "Infinite Loops",
-          type: "concept",
-          content: "If the condition in a while loop never becomes false, the loop will run forever. This is often caused by forgetting to update the loop variable.",
-          code: `int i = 1;
+          heading: "The while Loop — Check Before Execute",
+          type: "syntax",
+          content: "The `while` loop checks the condition **first**. If the condition is false at the very start, the body **never executes** (0 iterations).",
+          flowchart: "loop",
+          code: `// Syntax:
+while (condition) {
+    // Body: executes as long as condition is true
+}
+
+// Example: Print 1 to 5
+int i = 1;
 while (i <= 5) {
     printf("%d ", i);
-    // Missing i++; -> Infinite loop!
+    i++; // CRITICAL: Forget this and you get an infinite loop!
 }`
         },
         {
           id: "s6-3",
-          heading: "The do-while Loop",
+          heading: "Infinite Loops — A Common Trap",
+          type: "concept",
+          content: "An **infinite loop** occurs when the loop condition never becomes false. This causes the program to hang. Common causes:\n- Forgetting to update the loop variable (e.g., missing `i++`)\n- Using assignment (`=`) instead of comparison (`==`) in the condition\n- Logic error in the condition itself",
+          code: `// DANGER: Missing i++ - Runs forever!
+int i = 1;
+while (i <= 5) {
+    printf("%d ", i);
+    // i++ is missing!
+}
+
+// INTENTIONAL infinite loop (with a break to exit):
+while (1) { // '1' is always true
+    char cmd[50];
+    scanf("%s", cmd);
+    if (strcmp(cmd, "quit") == 0) break;
+    // process cmd...
+}`
+        },
+        {
+          id: "s6-4",
+          heading: "The do-while Loop — Execute Before Check",
           type: "syntax",
-          content: "The `do-while` loop executes the code block FIRST, and then checks the condition. This guarantees the loop runs at least once.",
-          code: `int choice;
+          content: "The `do-while` loop executes the body **first**, then checks the condition. This **guarantees at least one execution**.\n\nThe most common use case is a **menu-driven program** where you always want to show the menu at least once.",
+          code: `// Syntax:
 do {
-    printf("1. Play\\n2. Exit\\nEnter choice: ");
+    // Body: executes FIRST, then condition is checked
+} while (condition); // Note the semicolon!
+
+// Classic Use: Input Validation Menu
+int choice;
+do {
+    printf("1. Play  2. Settings  3. Exit\\n");
+    printf("Your choice: ");
     scanf("%d", &choice);
-} while (choice != 2);`
+} while (choice != 3); // Keep showing menu until user exits`
+        },
+        {
+          id: "s6-5",
+          heading: "Comparison: for vs while vs do-while",
+          type: "concept",
+          content: "All three loops can solve the same problems, but each has its ideal use case:",
+          table: {
+            headers: ["Loop", "Best Used When", "Minimum Iterations", "Condition Checked"],
+            rows: [
+              ["for", "Number of iterations is known", "0 (condition checked first)", "Before each iteration"],
+              ["while", "Number of iterations is unknown", "0 (condition checked first)", "Before each iteration"],
+              ["do-while", "Body must run at least once", "1 (body runs first)", "After each iteration"]
+            ]
+          }
         }
       ]
     },
@@ -151,40 +194,88 @@ do {
       sections: [
         {
           id: "s7-1",
-          heading: "The break Statement",
-          type: "syntax",
-          content: "The `break` statement immediately terminates the loop (or switch statement) it is inside.",
-          code: `for (int i = 1; i <= 10; i++) {
-    if (i == 5) {
-        break; // Loop stops when i is 5
-    }
-    printf("%d ", i);
-}
-// Output: 1 2 3 4`
+          heading: "Why Jump Statements?",
+          type: "definition",
+          content: "Normal loops run from start to finish for every iteration. But sometimes you need to **break out early** (e.g., you found the answer) or **skip to the next iteration** (e.g., skip invalid data). C provides three jump statements for this: `break`, `continue`, and `goto`.",
         },
         {
           id: "s7-2",
-          heading: "The continue Statement",
+          heading: "The break Statement",
           type: "syntax",
-          content: "The `continue` statement skips the rest of the code in the current iteration and jumps to the next iteration of the loop.",
-          code: `for (int i = 1; i <= 5; i++) {
-    if (i == 3) {
-        continue; // Skips 3
+          content: "The `break` statement **immediately terminates** the innermost enclosing loop or `switch` statement. Execution continues at the statement immediately following the loop. It is essential for **early exit** when a condition is met.",
+          code: `// Find the first number divisible by 7
+for (int i = 1; i <= 100; i++) {
+    if (i % 7 == 0) {
+        printf("First divisible by 7: %d\\n", i); // 7
+        break; // Stops the loop immediately, don't check i=8,9,...
     }
-    printf("%d ", i);
 }
-// Output: 1 2 4 5`
+
+// In nested loops, break only exits the INNERMOST loop:
+for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3; j++) {
+        if (j == 1) break; // Exits inner loop only
+        printf("%d,%d ", i, j);
+    }
+}`
         },
         {
           id: "s7-3",
+          heading: "The continue Statement",
+          type: "syntax",
+          content: "The `continue` statement **skips the rest of the current iteration** and jumps to the next iteration. The loop itself continues. It is used to **filter out** unwanted values.",
+          code: `// Print numbers 1-10, but skip multiples of 3
+for (int i = 1; i <= 10; i++) {
+    if (i % 3 == 0) {
+        continue; // Skip this iteration, go to i++
+    }
+    printf("%d ", i);
+}
+// Output: 1 2 4 5 7 8 10
+
+// In a while loop, continue jumps back to the condition check:
+int i = 0;
+while (i < 10) {
+    i++;
+    if (i % 2 == 0) continue; // Skip even numbers
+    printf("%d ", i);
+}
+// Output: 1 3 5 7 9`
+        },
+        {
+          id: "s7-4",
+          heading: "break vs continue — The Key Difference",
+          type: "concept",
+          content: "It's easy to confuse `break` and `continue`. Here's a side-by-side comparison:",
+          table: {
+            headers: ["Statement", "What it does", "Loop continues?", "Analogy"],
+            rows: [
+              ["break", "Exits the entire loop immediately", "No", "Emergency stop button"],
+              ["continue", "Skips the current iteration only", "Yes", "Skip this chapter, read the next"]
+            ]
+          }
+        },
+        {
+          id: "s7-5",
           heading: "The goto Statement",
           type: "concept",
-          content: "The `goto` statement jumps to a specific label in the code. Its use is generally discouraged as it makes code hard to read (spaghetti code), but it can be useful for breaking out of deeply nested loops.",
-          code: `int i = 0;
-start: // Label
+          content: "The `goto` statement unconditionally jumps to a labeled statement in the same function. While generally **discouraged** because it creates 'spaghetti code' that's hard to debug, it has one legitimate use: breaking out of multiple levels of deeply nested loops.",
+          code: `// Not recommended (bad practice):
+int i = 0;
+start:
     printf("%d ", i);
     i++;
-    if (i < 5) goto start;`
+    if (i < 5) goto start;
+
+// Legitimate use: Breaking out of nested loops
+for (int i = 0; i < 10; i++) {
+    for (int j = 0; j < 10; j++) {
+        if (i * j > 30) goto done; // Exit BOTH loops at once
+        printf("%d ", i * j);
+    }
+}
+done:
+    printf("Done!\\n");`
         }
       ]
     },
@@ -292,36 +383,80 @@ start: // Label
       sections: [
         {
           id: "s8-1",
-          heading: "What is an Array?",
+          heading: "The Problem Arrays Solve",
           type: "definition",
-          content: "An array is a collection of variables of the same type stored sequentially in memory.",
+          content: "Suppose you need to store marks for 100 students. Without arrays, you'd need 100 separate variables: `marks1`, `marks2`, ..., `marks100`. That's unmanageable!\n\nAn **array** stores multiple values of the **same data type** in a **contiguous (adjacent) block of memory**, accessible via a single variable name and an index.",
         },
         {
           id: "s8-2",
-          heading: "Declaration and Initialization",
-          type: "syntax",
-          content: "Specify the type, name, and size in brackets.",
-          code: `int marks[5]; // Declares an array of 5 integers
-int scores[] = {90, 85, 78}; // Size is automatically 3`
+          heading: "Array Memory Layout",
+          type: "concept",
+          content: "When you declare `int arr[5]`, the OS allocates 5 × 4 = **20 consecutive bytes** in RAM. Each element is stored right after the previous one:",
+          table: {
+            headers: ["Index", "arr[0]", "arr[1]", "arr[2]", "arr[3]", "arr[4]"],
+            rows: [
+              ["Value", "10", "20", "30", "40", "50"],
+              ["Address (example)", "1000", "1004", "1008", "1012", "1016"]
+            ]
+          }
         },
         {
           id: "s8-3",
-          heading: "Accessing Elements",
-          type: "concept",
-          content: "Array indices start at 0. The first element is at index 0, the last is at index size-1.",
-          code: `int scores[3] = {90, 85, 78};
-printf("%d", scores[0]); // Prints 90
-scores[1] = 88; // Modifies the second element`
+          heading: "Declaration & Initialization",
+          type: "syntax",
+          content: "You can declare an array with or without initial values. When size is omitted with initialization, the compiler counts the elements.",
+          code: `// Method 1: Declare first, assign later
+int marks[5]; // 5 uninitialized integers (garbage values!)
+marks[0] = 90;
+marks[1] = 85;
+
+// Method 2: Initialize during declaration
+int scores[5] = {90, 85, 78, 92, 88};
+
+// Method 3: Partial initialization (rest are set to 0)
+int arr[5] = {1, 2}; // = {1, 2, 0, 0, 0}
+
+// Method 4: Auto-size (compiler determines size = 3)
+int vals[] = {100, 200, 300};
+
+// Initialize all to zero:
+int zeros[100] = {0};`
         },
         {
           id: "s8-4",
-          heading: "Traversing Arrays",
+          heading: "Accessing & Modifying Elements",
+          type: "syntax",
+          content: "Array elements are accessed using a **zero-based index** (0 to size-1). Accessing outside this range causes **undefined behavior** (a very dangerous bug called 'buffer overflow').",
+          code: `int arr[5] = {10, 20, 30, 40, 50};
+
+printf("%d\\n", arr[0]); // 10 (first element)
+printf("%d\\n", arr[4]); // 50 (last element)
+
+arr[2] = 99; // Modify the third element
+
+// DANGER: arr[5] is out of bounds (valid indices: 0 to 4)
+// printf("%d", arr[5]); // Undefined Behavior!`
+        },
+        {
+          id: "s8-5",
+          heading: "Traversing Arrays with Loops",
           type: "example",
-          content: "Use a for loop to iterate through an array.",
+          content: "The most common array operation is iterating over all elements using a `for` loop. The key rule: **loop from index 0 to N-1** (where N is the array size).",
           code: `int arr[5] = {1, 2, 3, 4, 5};
-for (int i = 0; i < 5; i++) {
+int n = 5;
+
+// Traverse (read all elements)
+for (int i = 0; i < n; i++) {
     printf("%d ", arr[i]);
-}`
+}
+
+// Find sum and max in a single pass
+int sum = 0, max = arr[0];
+for (int i = 0; i < n; i++) {
+    sum += arr[i];
+    if (arr[i] > max) max = arr[i];
+}
+printf("Sum: %d, Max: %d\\n", sum, max);`
         }
       ]
     },
@@ -428,27 +563,72 @@ for (int i = 0; i < 5; i++) {
       sections: [
         {
           id: "s9-1",
-          heading: "Nested Loops Basics",
+          heading: "What is a Nested Loop?",
           type: "definition",
-          content: "A nested loop is a loop inside the body of another loop. The inner loop completes all its iterations for each single iteration of the outer loop.",
+          content: "A **nested loop** is a loop placed inside the body of another loop. The outer loop controls the 'rows' and the inner loop controls the 'columns'.\n\n**Key Rule**: For every ONE iteration of the outer loop, the inner loop runs through **ALL its iterations**. If the outer loop runs N times and the inner M times, the innermost body runs **N × M** times total.",
         },
         {
           id: "s9-2",
-          heading: "Execution Flow",
+          heading: "Execution Flow Traced Step by Step",
           type: "syntax",
-          content: "If the outer loop runs N times and inner loop runs M times, the inner loop's body executes N x M times.",
-          code: `for (int i = 1; i <= 3; i++) {       // Outer loop (Rows)
-    for (int j = 1; j <= 3; j++) {   // Inner loop (Cols)
-        printf("* ");
+          content: "Let's trace exactly what happens for a 3×3 nested loop:",
+          code: `for (int i = 1; i <= 3; i++) {       // Outer (Rows)
+    for (int j = 1; j <= 3; j++) {   // Inner (Columns)
+        printf("(%d,%d) ", i, j);
     }
-    printf("\\n");
-}`
+    printf("\\n"); // New line after each row
+}
+// Trace:
+// i=1: j runs 1,2,3 -> (1,1) (1,2) (1,3)
+// i=2: j runs 1,2,3 -> (2,1) (2,2) (2,3)
+// i=3: j runs 1,2,3 -> (3,1) (3,2) (3,3)
+// Total inner loop body executions: 3 × 3 = 9`
         },
         {
           id: "s9-3",
-          heading: "Printing Patterns",
+          heading: "Pattern Printing Strategy",
           type: "concept",
-          content: "When printing patterns, the outer loop typically controls the rows, while the inner loop controls the columns (what gets printed on each row).",
+          content: "Nested loops are the classic tool for printing patterns. Follow this systematic approach to solve ANY pattern:",
+          table: {
+            headers: ["Step", "Question to Ask", "Example (Right Triangle, N=4)"],
+            rows: [
+              ["1", "How many rows?", "N rows"],
+              ["2", "What does each row look like?", "Row i has i stars"],
+              ["3", "Outer loop controls:", "i from 1 to N (rows)"],
+              ["4", "Inner loop controls:", "j from 1 to i (stars per row)"],
+              ["5", "After each row:", "printf('\\n') to go to next line"]
+            ]
+          },
+          code: `// Right Triangle Pattern (N=4):
+for (int i = 1; i <= 4; i++) {      // Each row
+    for (int j = 1; j <= i; j++) { // Stars on this row
+        printf("* ");
+    }
+    printf("\\n"); // Move to next row
+}
+// Output:
+// *
+// * *
+// * * *
+// * * * *`
+        },
+        {
+          id: "s9-4",
+          heading: "Pyramid Pattern — Adding Spaces",
+          type: "example",
+          content: "For a centered pyramid, each row needs spaces BEFORE the stars. The number of leading spaces decreases as we go down:",
+          code: `// Pyramid (N=4):
+for (int i = 1; i <= 4; i++) {
+    // Leading spaces: N-i spaces
+    for (int s = 1; s <= 4 - i; s++) printf("  ");
+    // Stars: 2*i - 1 stars
+    for (int j = 1; j <= 2 * i - 1; j++) printf("* ");
+    printf("\\n");
+}
+// Row 1: 3 spaces, 1 star
+// Row 2: 2 spaces, 3 stars
+// Row 3: 1 space, 5 stars
+// Row 4: 0 spaces, 7 stars`
         }
       ]
     },
@@ -558,29 +738,73 @@ for (int i = 0; i < 5; i++) {
           id: "s10-1",
           heading: "What is a 2D Array?",
           type: "definition",
-          content: "A 2D array is an array of arrays, visualised as a table with rows and columns.",
+          content: "A **2D array** is an array of arrays — visualized as a **table (matrix) with rows and columns**. It is perfect for representing grids, game boards, spreadsheets, and mathematical matrices.\n\nMemory-wise, even though we visualize it as 2D, the data is stored in a single **linear block** in RAM, with rows placed one after another (row-major order).",
         },
         {
           id: "s10-2",
-          heading: "Declaration and Initialization",
-          type: "syntax",
-          content: "Specify the number of rows and columns.",
-          code: `int matrix[2][3] = {
-    {1, 2, 3}, // Row 0
-    {4, 5, 6}  // Row 1
-};`
+          heading: "Memory Layout (Row-Major Order)",
+          type: "concept",
+          content: "For `int mat[2][3]`, C stores the elements as follows in memory:",
+          table: {
+            headers: ["Element", "mat[0][0]", "mat[0][1]", "mat[0][2]", "mat[1][0]", "mat[1][1]", "mat[1][2]"],
+            rows: [
+              ["Value", "1", "2", "3", "4", "5", "6"],
+              ["Address", "1000", "1004", "1008", "1012", "1016", "1020"]
+            ]
+          }
         },
         {
           id: "s10-3",
-          heading: "Traversing a 2D Array",
+          heading: "Declaration & Initialization",
+          type: "syntax",
+          content: "The declaration specifies [rows][columns]. The first dimension can sometimes be omitted if initialized.",
+          code: `// Declare a 2×3 matrix (2 rows, 3 columns)
+int mat[2][3];
+
+// Initialize during declaration (rows in {})
+int matrix[2][3] = {
+    {1, 2, 3},  // Row 0
+    {4, 5, 6}   // Row 1
+};
+
+// Access using [row][column]
+printf("%d", matrix[0][2]); // 3 (row 0, column 2)
+printf("%d", matrix[1][0]); // 4 (row 1, column 0)`
+        },
+        {
+          id: "s10-4",
+          heading: "Traversing with Nested Loops",
           type: "example",
-          content: "Use nested loops to iterate over rows and columns.",
-          code: `for (int i = 0; i < 2; i++) {
-    for (int j = 0; j < 3; j++) {
-        printf("%d ", matrix[i][j]);
+          content: "The standard way to process a 2D array is with **two nested for loops**: outer loop for rows (`i`), inner loop for columns (`j`).",
+          code: `int mat[3][3] = {
+    {1, 2, 3},
+    {4, 5, 6},
+    {7, 8, 9}
+};
+
+// Print in matrix format
+for (int i = 0; i < 3; i++) {       // Each row
+    for (int j = 0; j < 3; j++) {   // Each column in that row
+        printf("%3d ", mat[i][j]);   // %3d pads to 3 chars wide
     }
-    printf("\\n");
+    printf("\\n"); // Newline after each row
 }`
+        },
+        {
+          id: "s10-5",
+          heading: "Key Matrix Operations",
+          type: "concept",
+          content: "Many important algorithms work on 2D arrays:",
+          table: {
+            headers: ["Operation", "Key Idea", "Time Complexity"],
+            rows: [
+              ["Print Matrix", "Loop i (rows), j (cols), printf mat[i][j]", "O(N×M)"],
+              ["Sum All Elements", "Accumulate mat[i][j] for all i,j", "O(N×M)"],
+              ["Matrix Addition", "result[i][j] = A[i][j] + B[i][j]", "O(N×M)"],
+              ["Transpose", "result[j][i] = mat[i][j] (swap row/col)", "O(N×M)"],
+              ["Matrix Multiplication", "result[i][j] = sum of A[i][k]*B[k][j] for all k", "O(N³)"]
+            ]
+          }
         }
       ]
     },

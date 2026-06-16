@@ -15,24 +15,91 @@ export const topic16to20 = [
           id: "s16-1",
           heading: "What is Recursion?",
           type: "definition",
-          content: "Recursion occurs when a function calls itself. It's often used to break down a problem into smaller, similar sub-problems.",
+          content: "**Recursion** is when a function calls **itself** as part of its own definition. It's a powerful technique for solving problems that can be broken into **smaller, identical sub-problems**.\n\nEvery recursive solution has two parts:\n1. **Base Case**: The condition that **stops** the recursion. Without it, the function calls itself forever → Stack Overflow.\n2. **Recursive Case**: Where the function calls itself with a **simpler version** of the original problem.",
         },
         {
           id: "s16-2",
-          heading: "Base Case",
+          heading: "The Call Stack — How Recursion Works in Memory",
           type: "concept",
-          content: "Every recursive function MUST have a base case (a condition to stop calling itself). Without it, the function will run infinitely and cause a Stack Overflow.",
-          code: `void recurse(int count) {
-    if (count <= 0) return; // Base case
-    printf("Hello\\n");
-    recurse(count - 1); // Recursive call
-}`
+          content: "Each recursive call creates a new **stack frame**. The stack grows with each call and shrinks as each call returns. Here's a step-by-step trace of `factorial(3) = 6`:",
+          table: {
+            headers: ["Step", "Call", "Action"],
+            rows: [
+              ["1 →", "factorial(3)", "3 != 1, so calls factorial(2)... waits"],
+              ["2 →", "factorial(2)", "2 != 1, so calls factorial(1)... waits"],
+              ["3 →", "factorial(1)", "Base case! Returns 1"],
+              ["4 ←", "factorial(2)", "Resumes: returns 2 × 1 = 2"],
+              ["5 ←", "factorial(3)", "Resumes: returns 3 × 2 = 6"]
+            ]
+          },
+          code: `long long factorial(int n) {
+    // Base case: stops the recursion
+    if (n <= 1) return 1;
+    // Recursive case: problem gets smaller each time (n-1)
+    return n * factorial(n - 1);
+}
+// factorial(5) = 5 * 4 * 3 * 2 * 1 = 120`
         },
         {
           id: "s16-3",
-          heading: "Recursive vs Iterative",
+          heading: "Base Case: The Most Critical Part",
           type: "concept",
-          content: "Anything written with a loop (iterative) can be written with recursion. Recursion is cleaner for problems like trees or graphs but uses more memory.",
+          content: "The base case is what **prevents infinite recursion**. Always identify it FIRST before writing the recursive case. A missing or wrong base case causes a **Stack Overflow** (the stack runs out of memory from too many nested calls).",
+          code: `// BROKEN: No base case - infinite recursion!
+void countDown(int n) {
+    printf("%d ", n);
+    countDown(n - 1); // Never stops! Stack Overflow!
+}
+
+// FIXED: Base case added
+void countDown(int n) {
+    if (n < 0) return; // Base case: stop at -1
+    printf("%d ", n);
+    countDown(n - 1); // Recursive case
+}`
+        },
+        {
+          id: "s16-4",
+          heading: "Recursion vs Iteration — Tradeoffs",
+          type: "concept",
+          content: "Both approaches can solve the same problems. Choosing the right one matters:",
+          table: {
+            headers: ["Factor", "Recursion", "Iteration (Loops)"],
+            rows: [
+              ["Readability", "Often cleaner (mirrors math definition)", "More explicit and verbose"],
+              ["Memory", "More: each call uses stack space", "Less: only loop variables"],
+              ["Speed", "Slightly slower (function call overhead)", "Faster in practice"],
+              ["Stack Overflow", "Possible for deep recursion (e.g., n=100000)", "Not a concern"],
+              ["Best for", "Trees, graphs, divide & conquer, backtracking", "Simple counting loops, array traversal"]
+            ]
+          }
+        },
+        {
+          id: "s16-5",
+          heading: "Fibonacci — A Classic Recursive Problem",
+          type: "example",
+          content: "Fibonacci shows both the elegance and the danger of naive recursion. `fib(n)` with plain recursion is O(2^n) because it recalculates the same values repeatedly.",
+          code: `// Naive recursive Fibonacci: O(2^n) - SLOW for large n
+int fib(int n) {
+    if (n == 0) return 0; // Base case 1
+    if (n == 1) return 1; // Base case 2
+    return fib(n-1) + fib(n-2); // Two recursive calls
+}
+// fib(5) call tree:
+//            fib(5)
+//        fib(4)    fib(3)
+//     fib(3) fib(2) fib(2) fib(1)
+// ... fib(2) is calculated 3 times!
+
+// Optimized: Use a loop (O(n) time, O(1) space)
+int fibFast(int n) {
+    if (n <= 1) return n;
+    int a = 0, b = 1, c;
+    for (int i = 2; i <= n; i++) {
+        c = a + b; a = b; b = c;
+    }
+    return b;
+}`
         }
       ]
     },
@@ -138,26 +205,104 @@ export const topic16to20 = [
       sections: [
         {
           id: "s17-1",
-          heading: "Why Files?",
+          heading: "Why Files? The Persistence Problem",
           type: "definition",
-          content: "Variables store data temporarily in RAM. Files store data permanently on disk.",
+          content: "All variables and arrays are stored in **RAM** (volatile memory). When your program ends, all data is **lost**. Files let you store data **permanently** on a disk (hard drive, SSD), so it survives after the program terminates.\n\n**Real-world use cases**:\n- Saving game progress\n- Writing logs/reports\n- Reading configuration settings\n- Storing a database of records",
         },
         {
           id: "s17-2",
-          heading: "File Operations",
-          type: "syntax",
-          content: "To work with a file: open it, read/write, then close it using a `FILE` pointer.",
-          code: `FILE *fp = fopen("data.txt", "w"); // "w" is write mode
-if (fp != NULL) {
-    fprintf(fp, "Hello File!\\n");
-    fclose(fp);
-}`
+          heading: "File Modes — Complete Reference",
+          type: "concept",
+          content: "When opening a file with `fopen()`, you must specify a **mode** that determines what operations are allowed:",
+          table: {
+            headers: ["Mode", "Meaning", "File Exists?", "File Missing?"],
+            rows: [
+              [`"r"`, "Read only", "Opens it", "Returns NULL (error)"],
+              [`"w"`, "Write only", "Truncates (clears) it", "Creates new file"],
+              [`"a"`, "Append only", "Appends to end", "Creates new file"],
+              [`"r+"`, "Read + Write", "Opens it", "Returns NULL (error)"],
+              [`"w+"`, "Read + Write", "Truncates it", "Creates new file"],
+              [`"rb"`, "Read binary", "Opens binary file", "Returns NULL"],
+              [`"wb"`, "Write binary", "Truncates binary file", "Creates new file"]
+            ]
+          }
         },
         {
           id: "s17-3",
-          heading: "File Modes",
+          heading: "The FILE Workflow (Open → Read/Write → Close)",
+          type: "syntax",
+          content: "Every file operation follows the same three steps. **Always check if `fopen` returns NULL** before using the file pointer.",
+          code: `#include <stdio.h>
+
+int main() {
+    // Step 1: Open the file
+    FILE *fp = fopen("data.txt", "w"); // Open for writing
+    
+    // Step 2: ALWAYS check for errors!
+    if (fp == NULL) {
+        printf("Error: Could not open file!\\n");
+        return 1; // Exit with error code
+    }
+    
+    // Step 3: Read/Write operations
+    fprintf(fp, "Hello, File!\\n");   // Write formatted text
+    fprintf(fp, "Number: %d\\n", 42);
+    
+    // Step 4: Close the file (MANDATORY - flushes buffer to disk)
+    fclose(fp);
+    printf("File written successfully.\\n");
+    return 0;
+}`
+        },
+        {
+          id: "s17-4",
+          heading: "Reading Files — All Methods",
           type: "concept",
-          content: "`r` = read, `w` = write (overwrites), `a` = append. Add `b` for binary (e.g., `rb`, `wb`).",
+          content: "Different functions are optimized for different types of reading:",
+          table: {
+            headers: ["Function", "Reads", "Use When", "Example"],
+            rows: [
+              ["fscanf(fp, fmt, ...)", "Formatted data", "Reading numbers/words", `fscanf(fp, "%d", &n)`],
+              ["fgets(buf, size, fp)", "One line at a time", "Reading text line by line", `fgets(line, 100, fp)`],
+              ["fgetc(fp)", "One character at a time", "Character-by-character processing", `char c = fgetc(fp)`],
+              ["fread(buf, size, n, fp)", "Binary blocks", "Reading binary data/structs", `fread(&s, sizeof(s), 1, fp)`]
+            ]
+          },
+          code: `// Read all lines from a file:
+FILE *fp = fopen("notes.txt", "r");
+if (fp == NULL) return 1;
+
+char line[256];
+while (fgets(line, sizeof(line), fp) != NULL) {
+    printf("%s", line); // fgets keeps the '\n'
+}
+fclose(fp);
+
+// Read until EOF using fgetc:
+char c;
+while ((c = fgetc(fp)) != EOF) {
+    putchar(c);
+}`
+        },
+        {
+          id: "s17-5",
+          heading: "Binary File I/O with Structs",
+          type: "concept",
+          content: "For storing complex records (like structs), binary files are more efficient and compact than text files. Use `fwrite` and `fread`.",
+          code: `struct Student { int id; char name[50]; float gpa; };
+
+// Write a struct to binary file
+struct Student s1 = {101, "Alice", 3.9};
+FILE *fp = fopen("students.dat", "wb");
+fwrite(&s1, sizeof(struct Student), 1, fp); // 1 record
+fclose(fp);
+
+// Read it back:
+struct Student s2;
+fp = fopen("students.dat", "rb");
+fread(&s2, sizeof(struct Student), 1, fp);
+fclose(fp);
+printf("%d %s %.2f\\n", s2.id, s2.name, s2.gpa); // 101 Alice 3.90`
         }
       ]
     },
@@ -258,25 +403,108 @@ if (fp != NULL) {
       sections: [
         {
           id: "s18-1",
-          heading: "What is DMA?",
+          heading: "Stack vs Heap — Two Types of Memory",
           type: "definition",
-          content: "Dynamic Memory Allocation allows you to allocate memory during program execution (at runtime), rather than at compile time.",
+          content: "Every C program uses two regions of memory at runtime:",
+          table: {
+            headers: ["Feature", "Stack", "Heap"],
+            rows: [
+              ["What's stored", "Local variables, function parameters", "Dynamically allocated memory"],
+              ["Size", "Fixed & small (typically 1-8 MB)", "Large (limited by OS/RAM)"],
+              ["Managed by", "Compiler automatically", "Programmer manually"],
+              ["Lifetime", "Auto-freed when function returns", "Lives until `free()` is called"],
+              ["Speed", "Very fast", "Slightly slower (system call overhead)"],
+              ["Error if full", "Stack Overflow", "malloc returns NULL"]
+            ]
+          }
         },
         {
           id: "s18-2",
-          heading: "malloc() and free()",
-          type: "syntax",
-          content: "`malloc` allocates a block of memory. `free` releases it. They require `<stdlib.h>`.",
-          code: `#include <stdlib.h>
-int *ptr = (int*) malloc(5 * sizeof(int)); // Array of 5 ints
-if (ptr == NULL) { /* Handle error */ }
-free(ptr); // Must free when done!`
+          heading: "Why DMA? The Problem with Fixed-Size Arrays",
+          type: "concept",
+          content: "With static arrays, you must know the size **at compile time**: `int arr[100]`. But what if the user needs 1 element? You waste 99 × 4 = 396 bytes. What if they need 200? The program crashes.\n\n**Dynamic Memory Allocation (DMA)** solves this by letting you allocate exactly the right amount of memory **at runtime**.",
+          code: `// Static array: size fixed at compile time
+int n = 100; // Must be a compile-time constant in old C
+int arr[100]; // Always 400 bytes, even if n is 5
+
+// Dynamic array: size determined at runtime
+int n;
+scaf("%d", &n);
+int *arr = (int*) malloc(n * sizeof(int)); // Exactly n * 4 bytes`
         },
         {
           id: "s18-3",
-          heading: "calloc() and realloc()",
+          heading: "malloc(), calloc(), realloc(), free()",
+          type: "syntax",
+          content: "The four DMA functions, all from `<stdlib.h>`:",
+          table: {
+            headers: ["Function", "Signature", "Initializes?", "Use Case"],
+            rows: [
+              ["malloc", "void* malloc(size_t size)", "No (garbage)", "Allocate a block of N bytes"],
+              ["calloc", "void* calloc(size_t n, size_t size)", "Yes (zeros)", "Allocate N elements, all zeroed"],
+              ["realloc", "void* realloc(void* ptr, size_t newSize)", "No", "Resize an existing allocation"],
+              ["free", "void free(void* ptr)", "N/A", "Release allocated memory back to OS"]
+            ]
+          },
+          code: `#include <stdlib.h>
+
+// malloc: allocates, does NOT initialize (contains garbage!)
+int *arr = (int*) malloc(5 * sizeof(int));
+if (arr == NULL) { printf("Out of memory!\\n"); exit(1); }
+
+// calloc: allocates AND initializes to zero
+int *zeros = (int*) calloc(5, sizeof(int)); // All elements = 0
+
+// realloc: grow or shrink an existing allocation
+arr = (int*) realloc(arr, 10 * sizeof(int)); // Now holds 10 ints
+
+// free: MANDATORY cleanup to prevent memory leaks
+free(arr);
+free(zeros);
+arr = NULL; // Good practice: set to NULL after freeing!`
+        },
+        {
+          id: "s18-4",
+          heading: "Memory Leaks — The Silent Danger",
           type: "concept",
-          content: "`calloc` is like `malloc` but initializes memory to zero. `realloc` resizes an already allocated block of memory.",
+          content: "A **memory leak** occurs when you allocate memory but never `free()` it. The memory remains occupied until the program ends. In long-running programs (servers, daemons), leaks cause the system to run out of memory.",
+          code: `// Memory Leak: malloc without free
+void leaky() {
+    int *p = (int*) malloc(100 * sizeof(int));
+    // ... use p ...
+    // FORGOT to free(p)! 400 bytes leaked each call!
+}
+
+// Correct:
+void notLeaky() {
+    int *p = (int*) malloc(100 * sizeof(int));
+    if (p == NULL) return;
+    // ... use p ...
+    free(p); // Always free when done!
+    p = NULL; // Prevent dangling pointer
+}`
+        },
+        {
+          id: "s18-5",
+          heading: "Dynamic 2D Arrays",
+          type: "example",
+          content: "To create a 2D array dynamically (rows and columns known only at runtime), use an array of pointers:",
+          code: `int rows = 3, cols = 4;
+
+// Step 1: Allocate array of row pointers
+int **matrix = (int**) malloc(rows * sizeof(int*));
+
+// Step 2: Allocate each row
+for (int i = 0; i < rows; i++) {
+    matrix[i] = (int*) malloc(cols * sizeof(int));
+}
+
+// Use it like a normal 2D array!
+matrix[1][2] = 42;
+
+// Free in reverse order (rows first, then pointer array)
+for (int i = 0; i < rows; i++) free(matrix[i]);
+free(matrix);`
         }
       ]
     },
@@ -380,29 +608,88 @@ free(ptr); // Must free when done!`
           id: "s19-1",
           heading: "What is a Union?",
           type: "definition",
-          content: "A `union` is like a struct, but all its members share the SAME memory location. Its size is the size of its largest member.",
+          content: "A **`union`** is a user-defined type where **all members share the same memory location**. Only one member holds a valid value at any given time. The union's size equals the size of its **largest member**.\n\n**Real-world use**: Unions are used in embedded systems, network protocol parsing, and type-punning (interpreting the same bytes as different types).",
+          code: `union Data {
+    int i;    // 4 bytes
+    float f;  // 4 bytes
+    char c;   // 1 byte
+};
+// sizeof(union Data) = 4 (the largest member)
+
+union Data d;
+d.i = 42;  // Use it as an int
+printf("%d\\n", d.i); // 42
+
+d.f = 3.14f; // Now use as float - overwrites d.i!
+printf("%.2f\\n", d.f); // 3.14
+// printf("%d", d.i); // INVALID: d.i is now corrupted`
         },
         {
           id: "s19-2",
-          heading: "Union Example",
-          type: "syntax",
-          content: "You can only use one member at a time.",
-          code: `union Data {
-    int i;
-    float f;
-};
-union Data d;
-d.i = 10;
-// If we set d.f = 2.5, d.i is corrupted/overwritten.`
+          heading: "Bitwise Operators — Complete Reference",
+          type: "concept",
+          content: "Bitwise operators work on individual **bits** (0s and 1s) of integer values. They are extremely fast and used in performance-critical code, hardware control, and cryptography.",
+          table: {
+            headers: ["Operator", "Name", "Rule", "Example (a=5=0101, b=3=0011)"],
+            rows: [
+              ["&", "AND", "1 only if BOTH bits are 1", "5 & 3 = 0001 = 1"],
+              ["|", "OR", "1 if EITHER bit is 1", "5 | 3 = 0111 = 7"],
+              ["^", "XOR", "1 if bits are DIFFERENT", "5 ^ 3 = 0110 = 6"],
+              ["~", "NOT", "Inverts all bits", "~5 = ...11111010 = -6 (two's complement)"],
+              ["<<", "Left Shift", "Shifts bits left, fills with 0 (× 2^n)", "5 << 1 = 1010 = 10"],
+              [">>", "Right Shift", "Shifts bits right (÷ 2^n)", "5 >> 1 = 0010 = 2"]
+            ]
+          }
         },
         {
           id: "s19-3",
-          heading: "Bitwise Operators",
+          heading: "Bit-Level Trace: AND, OR, XOR",
+          type: "syntax",
+          content: "To understand bitwise operations, align the bits and apply the rule column by column:",
+          code: `//  a = 5  ->  0 1 0 1
+//  b = 3  ->  0 0 1 1
+
+// AND (&): 1 only if BOTH are 1
+//          0 0 0 1  = 1
+printf("%d\\n", 5 & 3); // 1
+
+// OR (|): 1 if EITHER is 1
+//         0 1 1 1  = 7
+printf("%d\\n", 5 | 3); // 7
+
+// XOR (^): 1 if they are DIFFERENT
+//          0 1 1 0  = 6
+printf("%d\\n", 5 ^ 3); // 6`
+        },
+        {
+          id: "s19-4",
+          heading: "Practical Bit Manipulation Tricks",
           type: "concept",
-          content: "Bitwise operators perform operations at the bit level: `&` (AND), `|` (OR), `^` (XOR), `~` (NOT), `<<` (Left Shift), `>>` (Right Shift).",
-          code: `int a = 5;  // Binary 0101
-int b = 3;  // Binary 0011
-int c = a & b; // 0001 (Decimal 1)`
+          content: "Bitwise operators enable elegant, high-performance tricks:",
+          table: {
+            headers: ["Task", "Code", "Why it works"],
+            rows: [
+              ["Check if even/odd", "n & 1  (0=even, 1=odd)", "Last bit is 0 for even, 1 for odd"],
+              ["Multiply by 2^k", "n << k", "Left shift moves bits left = multiplying"],
+              ["Divide by 2^k", "n >> k", "Right shift moves bits right = dividing"],
+              ["Swap without temp", "a^=b; b^=a; a^=b;", "XOR trick - each pair cancels out"],
+              ["Set bit k", "n | (1 << k)", "OR with a mask that has only bit k set"],
+              ["Clear bit k", "n & ~(1 << k)", "AND with mask that has bit k as 0"]
+            ]
+          },
+          code: `int n = 6; // 0110
+
+// Check even/odd without %:
+if (n & 1) printf("Odd\\n"); else printf("Even\\n"); // Even
+
+// Power-of-2 multiply/divide:
+printf("%d\\n", n << 2); // 6 * 4 = 24
+printf("%d\\n", n >> 1); // 6 / 2 = 3
+
+// Swap without temp variable:
+int a = 5, b = 9;
+a ^= b; b ^= a; a ^= b;
+printf("%d %d\\n", a, b); // 9 5`
         }
       ]
     },
@@ -486,60 +773,6 @@ int c = a & b; // 0001 (Decimal 1)`
         sampleInput: "None",
         sampleOutput: "8",
         timeComplexity: "O(1)"
-      }
-    ]
-  },
-  {
-    id: "topic-20",
-    slug: "mini-project",
-    title: "Mini Project",
-    shortTitle: "Project",
-    icon: "🚀",
-    color: "from-indigo-500 to-purple-600",
-    borderColor: "border-indigo-500/30",
-    glowColor: "shadow-indigo-500/20",
-    description: "Apply your C programming skills to build a complete, real-world application.",
-    theory: {
-      sections: []
-    },
-    problems: [
-      {
-        id: "p20-1",
-        title: "Parking Management System",
-        difficulty: "Hard",
-        statement: "Build a complete Parking Management System in C. Features include: secure admin login, vehicle entry registration with dynamic ID generation, fee calculation based on duration and vehicle type, vehicle search, visual parking map, and revenue tracking.",
-        inputFormat: "Interactive menu-driven command line input",
-        outputFormat: "Formatted console outputs, tables, and receipts",
-        constraints: "Maximum 50 parking slots, data must persist between runs",
-        logic: [
-          "Define structs for Admin, Vehicle, and Revenue",
-          "Implement File I/O for saving and loading data",
-          "Create a secure admin login system",
-          "Implement an interactive menu loop"
-        ],
-        solution: `// Complete code is provided in the previous data files.\n#include <stdio.h>\nint main() {\n  printf("Refer to full project code.\\n");\n  return 0;\n}`,
-        sampleInput: "Admin Login -> Menu -> Vehicle Entry",
-        sampleOutput: "WELCOME TO PARKING MANAGEMENT SYSTEM -> [Success] Login Successful!",
-        timeComplexity: "O(n) for searching files"
-      },
-      {
-        id: "p20-2",
-        title: "Library Management System",
-        difficulty: "Hard",
-        statement: "Build a complete Library Management System in C. Features include: admin authentication, book inventory management, student registration, issue/return tracking, fine calculation for overdue books, and inventory reporting.",
-        inputFormat: "Interactive menu-driven command line input",
-        outputFormat: "Formatted console outputs, receipts, and reports",
-        constraints: "Data must persist between runs, handle soft deletes",
-        logic: [
-          "Define structs for Admin, Book, Student, and IssueRecord",
-          "Implement File I/O for saving and loading data",
-          "Create a secure admin login system",
-          "Implement an interactive menu loop with 14 options"
-        ],
-        solution: `// Complete code is provided in the previous data files.\n#include <stdio.h>\nint main() {\n  printf("Refer to full project code.\\n");\n  return 0;\n}`,
-        sampleInput: "Admin Login -> Menu -> Add Book -> Issue Book",
-        sampleOutput: "WELCOME TO THE LIBRARY SYSTEM -> [Access Granted] -> Material issued successfully",
-        timeComplexity: "O(n) for searching files"
       }
     ]
   }

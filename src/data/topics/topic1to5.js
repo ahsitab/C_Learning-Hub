@@ -15,49 +15,96 @@ export const topic1to5 = [
           id: "s1-1",
           heading: "What is C?",
           type: "definition",
-          content: "C is a powerful general-purpose programming language. It is fast, portable, and provides low-level memory access, making it the foundation for many modern languages and operating systems.",
+          content: "C is a powerful, general-purpose, structured programming language developed by Dennis Ritchie at Bell Labs between 1969 and 1973. It is the foundation of modern computing — the Linux kernel, Windows NT, Python interpreter, and most embedded systems are all written in C.\n\nC gives programmers **direct control over memory** and hardware. Unlike higher-level languages that abstract these details away, C is often called a 'middle-level' language: it has the readability of a high-level language, but the power and efficiency of a low-level language like assembly.",
         },
         {
           id: "s1-2",
-          heading: "Basic Structure of a C Program",
-          type: "syntax",
-          content: "Every C program has a specific structure. It starts with preprocessor directives, followed by the main function where execution begins.",
-          code: `#include <stdio.h>  // Preprocessor directive for input/output
-
-int main() {         // The main function where execution starts
-    // Your code goes here
-    return 0;        // Indicates successful completion
-}`,
+          heading: "Why Learn C?",
+          type: "concept",
+          content: "C is the bedrock of computer science for several compelling reasons:\n- **Speed**: C programs run extremely fast since they compile directly to machine code.\n- **Portability**: A C program written on one machine can be compiled on another with minimal changes.\n- **Foundation**: Learning C teaches you how computers really work (memory, pointers, stack, heap).\n- **Prerequisite**: C++, Java, Python, JavaScript — all borrowed syntax and concepts from C.",
+          table: {
+            headers: ["Language", "Based on C?", "Key Borrowed Concept"],
+            rows: [
+              ["C++", "Yes (superset)", "All of C + OOP"],
+              ["Java", "C-like syntax", "{ } blocks, data types"],
+              ["Python", "Written in C", "Core data structures"],
+              ["JavaScript", "C-like syntax", "Control flow, operators"]
+            ]
+          }
         },
         {
           id: "s1-3",
-          heading: "Writing 'Hello World'",
-          type: "example",
-          content: "The `printf` function is used to output text to the screen. It is defined in the `<stdio.h>` library.",
-          code: `#include <stdio.h>
+          heading: "Basic Structure of a C Program",
+          type: "syntax",
+          content: "Every C program follows a strict structure. Understanding each part is critical before writing any code.",
+          code: `// 1. Header Files: Tell the compiler which libraries to include
+#include <stdio.h>   // Standard Input/Output (printf, scanf)
+#include <stdlib.h>  // Standard Library (malloc, free, exit)
 
+// 2. Global Declarations (optional): Variables/functions visible everywhere
+int globalCount = 0;
+
+// 3. Main Function: Entry point of every C program
 int main() {
-    printf("Hello, World!\\n");  // \\n prints a new line
+    // 4. Local Variable Declarations
+    int age = 20;
+
+    // 5. Statements (instructions to execute)
+    printf("Age: %d\\n", age);
+
+    // 6. Return Statement: 0 = success, any other value = error
     return 0;
-}`,
+}`
         },
         {
           id: "s1-4",
-          heading: "Comments in C",
+          heading: "The Compilation Pipeline (A to Z)",
           type: "concept",
-          content: "Comments are ignored by the compiler and are used to explain code. C supports single-line and multi-line comments.",
-          code: `// This is a single-line comment
-
-/* 
-   This is a 
-   multi-line comment 
-*/`,
+          content: "When you run a C program, it goes through 4 distinct stages before executing. Each stage transforms the file into something closer to machine code:",
+          table: {
+            headers: ["Stage", "Tool", "Input", "Output", "What Happens"],
+            rows: [
+              ["1. Preprocessing", "Preprocessor", "hello.c", "hello.i", "Expands #include, #define macros, removes comments"],
+              ["2. Compilation", "Compiler (GCC)", "hello.i", "hello.s", "Converts C code to Assembly language"],
+              ["3. Assembly", "Assembler", "hello.s", "hello.o", "Converts Assembly to binary object code"],
+              ["4. Linking", "Linker", "hello.o + libs", "hello.exe", "Combines object files and library functions into final executable"]
+            ]
+          }
         },
         {
           id: "s1-5",
-          heading: "Compilation Process",
+          heading: "Escape Sequences",
           type: "concept",
-          content: "C is a compiled language. The source code (.c) is compiled into machine code (.exe or .out) by a compiler (like GCC) before execution.",
+          content: "Escape sequences are special characters in a string preceded by a backslash `\\`. They represent non-printable or special characters.",
+          table: {
+            headers: ["Sequence", "Name", "Effect"],
+            rows: [
+              ["\\n", "Newline", "Moves cursor to next line"],
+              ["\\t", "Horizontal Tab", "Adds 8-space tab indent"],
+              ["\\\\", "Backslash", "Prints a literal \\"],
+              ["\\\"", "Double Quote", "Prints a literal \"inside a string\""],
+              ["\\r", "Carriage Return", "Moves cursor to start of same line"],
+              ["\\0", "Null", "Terminates strings (end-of-string marker)"]
+            ]
+          },
+          code: `printf("Name:\\tJohn\\n");   // Output: Name:   John
+printf("Line 1\\nLine 2"); // Output on two lines
+printf("He said \\"Hello\\""); // He said "Hello"`
+        },
+        {
+          id: "s1-6",
+          heading: "Comments in C",
+          type: "syntax",
+          content: "Comments are ignored by the compiler. Use them generously to explain logic. There are two styles:",
+          code: `// Single-line comment: Good for explaining one line
+
+/*
+   Multi-line comment:
+   Good for describing a whole function or
+   temporarily disabling a block of code.
+*/
+
+// Always write comments BEFORE complex logic, not after.`
         }
       ],
     },
@@ -161,51 +208,104 @@ int main() {
       sections: [
         {
           id: "s2-1",
-          heading: "Variables and Data Types",
+          heading: "Variables & Memory",
           type: "definition",
-          content: "A variable is a container for storing data. You must specify the data type before using a variable. Common types: `int` (integers), `float` (decimals), `char` (single characters).",
-          code: `int age = 20;
-float price = 99.99;
-char grade = 'A';`
+          content: "A **variable** is a named storage location in RAM (memory) that holds a value of a specific type. When you declare a variable, the operating system allocates a specific number of bytes to store it.\n\nEvery variable has three properties:\n- **Name**: The identifier used to reference it (e.g., `age`).\n- **Type**: Determines the size and the kind of data stored (e.g., `int`).\n- **Value**: The actual data stored at that memory location.",
+          code: `int age = 20;    // 4 bytes in RAM for an integer
+float pi = 3.14; // 4 bytes in RAM for a decimal
+char ch = 'A';   // 1 byte in RAM for a character`
         },
         {
           id: "s2-2",
-          heading: "Format Specifiers",
-          type: "syntax",
-          content: "Format specifiers tell `printf` and `scanf` what type of data to expect.",
-          code: `// %d for int
-// %f for float
-// %c for char
-printf("Age: %d, Grade: %c\\n", age, grade);`
+          heading: "Primitive Data Types in C",
+          type: "concept",
+          content: "C has several built-in (primitive) data types. Each has a fixed size and range of values it can represent.",
+          table: {
+            headers: ["Type", "Size (bytes)", "Range", "Format Specifier", "Example"],
+            rows: [
+              ["char", "1", "-128 to 127", "%c", "'A', 'z', '9'"],
+              ["int", "4", "-2,147,483,648 to 2,147,483,647", "%d", "42, -100, 0"],
+              ["short int", "2", "-32,768 to 32,767", "%hd", "1000, -200"],
+              ["long int", "8", "-9.2×10^18 to 9.2×10^18", "%ld", "1234567890L"],
+              ["float", "4", "~3.4×10^-38 to 3.4×10^38 (6 decimal places)", "%f", "3.14f"],
+              ["double", "8", "~1.7×10^-308 to 1.7×10^308 (15 decimal places)", "%lf", "3.14159265"],
+              ["unsigned int", "4", "0 to 4,294,967,295", "%u", "500, 0"]
+            ]
+          }
         },
         {
           id: "s2-3",
-          heading: "Reading Input with scanf",
-          type: "syntax",
-          content: "Use `scanf` to read user input. Remember to use the address-of operator `&` before variable names for numbers and characters.",
-          code: `int num;
-printf("Enter a number: ");
-scanf("%d", &num);`
+          heading: "ASCII & the char Type",
+          type: "concept",
+          content: "The `char` type stores a single character, but internally it's stored as a number (ASCII code). This means you can perform arithmetic on characters!",
+          table: {
+            headers: ["Character", "ASCII Value", "Useful Fact"],
+            rows: [
+              ["'A'", "65", "Uppercase A through Z = 65 to 90"],
+              ["'a'", "97", "Lowercase a through z = 97 to 122"],
+              ["'0'", "48", "Digit 0 through 9 = 48 to 57"],
+              ["'\\n'", "10", "Newline character"],
+              ["' '", "32", "Space character"]
+            ]
+          },
+          code: `char upper = 'A';
+char lower = upper + 32; // 65 + 32 = 97 = 'a'
+printf("%c\\n", lower);  // Prints: a
+
+// Check if character is a digit
+char c = '7';
+if (c >= '0' && c <= '9') {
+    int digit = c - '0'; // Convert '7' to integer 7
+}`
         },
         {
           id: "s2-4",
-          heading: "Arithmetic Operators",
-          type: "concept",
-          content: "C supports basic arithmetic operators: `+` (addition), `-` (subtraction), `*` (multiplication), `/` (division), and `%` (modulo - remainder of division).",
-          code: `int a = 10, b = 3;
-int sum = a + b;       // 13
-int diff = a - b;      // 7
-int prod = a * b;      // 30
-int div = a / b;       // 3 (integer division truncates decimal)
-int mod = a % b;       // 1 (remainder)`
+          heading: "Format Specifiers",
+          type: "syntax",
+          content: "Format specifiers are used with `printf` (output) and `scanf` (input) to indicate the data type being processed. Using the wrong specifier causes undefined behavior.",
+          table: {
+            headers: ["Specifier", "Type", "printf Example", "scanf Example"],
+            rows: [
+              ["%d", "int", `printf("%d", age)`, `scanf("%d", &age)`],
+              ["%f", "float", `printf("%.2f", pi)`, `scanf("%f", &pi)`],
+              ["%lf", "double", `printf("%lf", d)`, `scanf("%lf", &d)`],
+              ["%c", "char", `printf("%c", ch)`, `scanf(" %c", &ch)`],
+              ["%s", "string (char[])", `printf("%s", name)`, `scanf("%s", name)`],
+              ["%ld", "long int", `printf("%ld", n)`, `scanf("%ld", &n)`]
+            ]
+          }
         },
         {
           id: "s2-5",
-          heading: "Type Conversion (Casting)",
+          heading: "Arithmetic Operators & Integer Division",
           type: "concept",
-          content: "To perform accurate division with integers, convert them to float using casting.",
-          code: `int a = 5, b = 2;
-float result = (float)a / b; // 2.5`
+          content: "C supports all standard arithmetic operations. The most important thing to understand is **integer division**: when both operands are integers, the result is always an integer (the decimal part is **truncated**, not rounded).",
+          code: `int a = 10, b = 3;
+printf("%d\\n", a / b);  // 3 (NOT 3.33!) - decimal truncated
+printf("%d\\n", a % b);  // 1 (the remainder)
+
+// To get the decimal result, cast to float first:
+float result = (float)a / b;
+printf("%.2f\\n", result); // 3.33
+
+// Operator Precedence (BODMAS): * and / before + and -
+int x = 2 + 3 * 4; // = 2 + 12 = 14 (NOT 20)
+int y = (2 + 3) * 4; // = 5 * 4 = 20 (parentheses first)`
+        },
+        {
+          id: "s2-6",
+          heading: "Constants (const & #define)",
+          type: "syntax",
+          content: "A **constant** is a value that cannot be changed once set. Use constants for values like PI or array sizes to make code readable and safe.",
+          code: `// Method 1: const keyword (type-safe, preferred in modern C)
+const float PI = 3.14159;
+const int MAX_SIZE = 100;
+
+// Method 2: #define macro (simple text substitution by preprocessor)
+#define GRAVITY 9.81
+#define MAX_STUDENTS 50
+
+// PI = 3.0; // ERROR! Cannot reassign a const`
         }
       ]
     },
@@ -314,42 +414,58 @@ float result = (float)a / b; // 2.5`
       sections: [
         {
           id: "s3-1",
-          heading: "The if Statement",
-          type: "syntax",
-          content: "The `if` statement executes a block of code if its condition evaluates to true (non-zero).",
+          heading: "The if Statement & Truth Values",
+          type: "definition",
+          content: "The `if` statement is the most basic control flow statement in C. It decides whether to execute a block of statements based on a conditional test.\n\nIn C, there is no built-in Boolean type in core older versions (until C99 introduced <stdbool.h>). C evaluates conditions based on integer values:\n- **TRUE**: Any non-zero numeric value (e.g., 1, -5, 3.14).\n- **FALSE**: Zero (0).\n\nIf the condition evaluates to non-zero, the statements inside the braces are run.",
           code: `if (condition) {
-    // code to execute
+    // Code block executes ONLY if condition is true (non-zero)
 }`
         },
         {
           id: "s3-2",
-          heading: "Relational Operators",
+          heading: "Relational & Equality Operators",
           type: "concept",
-          content: "Use relational operators to compare values: `==` (equal), `!=` (not equal), `>` (greater than), `<` (less than), `>=` (greater or equal), `<=` (less or equal).",
+          content: "To form conditions, we use relational and equality operators to compare two operands. The result of these operations is always 1 (for true) or 0 (for false).",
+          table: {
+            headers: ["Operator", "Description", "Example", "Result (for x=10, y=20)"],
+            rows: [
+              ["==", "Equal to", "x == y", "0 (False)"],
+              ["!=", "Not equal to", "x != y", "1 (True)"],
+              [">", "Greater than", "x > y", "0 (False)"],
+              ["<", "Less than", "x < y", "1 (True)"],
+              [">=", "Greater than or equal to", "x >= y", "0 (False)"],
+              ["<=", "Less than or equal to", "x <= y", "1 (True)"]
+            ]
+          }
         },
         {
           id: "s3-3",
           heading: "The if-else Statement",
           type: "syntax",
-          content: "The `else` block executes when the `if` condition is false.",
+          content: "When you want to execute one block of code if a condition is true, and a *different* block if it is false, use an `if-else` statement. Only one of the two blocks will ever execute.\n\nBelow is the visual execution flow of an if-else decision path.",
+          flowchart: "if-else",
           code: `int age = 18;
 if (age >= 18) {
-    printf("Adult\\n");
+    printf("Access Granted. You are an adult.\\n");
 } else {
-    printf("Minor\\n");
+    printf("Access Denied. You are a minor.\\n");
 }`
         },
         {
           id: "s3-4",
-          heading: "The else if Ladder",
+          heading: "The else-if Ladder",
           type: "syntax",
-          content: "Use `else if` to check multiple mutually exclusive conditions.",
-          code: `if (score >= 90) {
-    printf("A\\n");
+          content: "When you have multiple mutually exclusive conditions to check, you can chain if-else statements together into an `else-if` ladder. The program checks conditions from top to bottom, executing the *first* block that evaluates to true, and then skipping the rest. If none of the conditions match, the optional final `else` block runs.",
+          code: `int score = 85;
+
+if (score >= 90) {
+    printf("Grade: A\\n");
 } else if (score >= 80) {
-    printf("B\\n");
+    printf("Grade: B\\n"); // This executes, and remaining blocks are skipped
+} else if (score >= 70) {
+    printf("Grade: C\\n");
 } else {
-    printf("C\\n");
+    printf("Grade: F\\n");
 }`
         }
       ]
@@ -453,40 +569,124 @@ if (age >= 18) {
           id: "s4-1",
           heading: "Logical Operators",
           type: "concept",
-          content: "C provides three logical operators to combine conditions: `&&` (Logical AND), `||` (Logical OR), and `!` (Logical NOT).",
+          content: "Logical operators are used to **combine or invert boolean (true/false) expressions**. They evaluate conditions and return either 1 (true) or 0 (false). C has three logical operators:",
+          table: {
+            headers: ["Operator", "Symbol", "Meaning", "Returns True When..."],
+            rows: [
+              ["Logical AND", "&&", "Both conditions", "ALL conditions are non-zero"],
+              ["Logical OR", "||", "Either condition", "AT LEAST ONE condition is non-zero"],
+              ["Logical NOT", "!", "Invert condition", "The condition IS zero (false)"]
+            ]
+          }
         },
         {
           id: "s4-2",
-          heading: "Logical AND (&&)",
-          type: "example",
-          content: "Returns true only if ALL conditions are true.",
-          code: `int age = 20;
-int hasID = 1; // 1 means true
-if (age >= 18 && hasID == 1) {
-    printf("Allowed entry\\n");
-}`
+          heading: "Truth Tables (The Complete Reference)",
+          type: "concept",
+          content: "A truth table shows all possible input combinations and their output for a logical operator. This is the mathematical foundation of decision-making in all computers.",
+          table: {
+            headers: ["A", "B", "A && B", "A || B", "!A"],
+            rows: [
+              ["0 (false)", "0 (false)", "0", "0", "1"],
+              ["0 (false)", "1 (true)", "0", "1", "1"],
+              ["1 (true)", "0 (false)", "0", "1", "0"],
+              ["1 (true)", "1 (true)", "1", "1", "0"]
+            ]
+          }
         },
         {
           id: "s4-3",
-          heading: "Logical OR (||)",
+          heading: "Logical AND (&&) — All must be true",
           type: "example",
-          content: "Returns true if AT LEAST ONE condition is true.",
-          code: `int day = 6; // 6=Saturday, 7=Sunday
-if (day == 6 || day == 7) {
-    printf("It's weekend!\\n");
+          content: "The `&&` operator is a **gatekeeper**: ALL conditions must be satisfied. Think of it as a door with TWO locks — both locks must be opened to enter.",
+          code: `int age = 20;
+int hasID = 1; // 1 = true
+if (age >= 18 && hasID == 1) {
+    printf("Entry Allowed\\n"); // Both conditions are true
+}
+
+// Short-Circuit Evaluation: If the FIRST condition is false,
+// C does NOT evaluate the second one at all. This is an optimization.
+int x = 0;
+if (x != 0 && (100 / x) > 5) { // Safe! Division never happens.
+    printf("Condition met\\n");
 }`
         },
         {
           id: "s4-4",
+          heading: "Logical OR (||) — At least one must be true",
+          type: "example",
+          content: "The `||` operator is an **OR gate**: if ANY condition is true, the whole expression is true. Think of it as a door with a spare key — any one key opens it.",
+          code: `int day = 6; // 6=Saturday
+if (day == 6 || day == 7) {
+    printf("Weekend! Time to rest.\\n");
+}
+
+// Short-Circuit Evaluation: If the FIRST condition is true,
+// C does NOT evaluate the second one. It already knows the result.
+int a = 5;
+if (a > 0 || (a / 0) == 1) { // Safe! Division by zero never happens.
+    printf("a is positive\\n");
+}`
+        },
+        {
+          id: "s4-5",
+          heading: "Logical NOT (!)",
+          type: "example",
+          content: "The `!` operator **inverts** a boolean value. Non-zero becomes 0, and 0 becomes 1. It's useful for making conditions more readable.",
+          code: `int loggedIn = 0; // 0 means false
+
+if (!loggedIn) { // Same as: if (loggedIn == 0)
+    printf("Please login first.\\n");
+}
+
+int isPrime = 1;
+// ... some check ...
+if (!isPrime) {
+    printf("Not a prime number.\\n");
+}`
+        },
+        {
+          id: "s4-6",
           heading: "Nested if Statements",
           type: "syntax",
-          content: "You can place an `if` statement inside another `if` statement.",
-          code: `if (num > 0) {
-    if (num % 2 == 0) {
+          content: "You can place an `if` statement inside another `if` statement. This is called **nesting**. It's used when a second condition only matters if a first condition is already true.\n\n**Best Practice**: Keep nesting to a maximum of 2-3 levels. Too many nested levels makes code hard to read ('arrow code' anti-pattern).",
+          code: `int num = 6;
+
+if (num > 0) {           // Outer if: Is it positive?
+    if (num % 2 == 0) {  // Inner if: Is it even? (Only checked if num > 0)
         printf("Positive Even\\n");
     } else {
         printf("Positive Odd\\n");
     }
+} else {
+    printf("Non-positive number\\n");
+}
+
+// The SAME logic using && (often cleaner):
+if (num > 0 && num % 2 == 0) {
+    printf("Positive Even\\n");
+}`
+        },
+        {
+          id: "s4-7",
+          heading: "The switch Statement — Multi-way Branch",
+          type: "syntax",
+          content: "When you need to check a single variable against many exact values, a `switch` statement is more readable than a long `else-if` ladder. Each `case` must end with `break` to prevent 'fall-through' to the next case.",
+          code: `int day = 3;
+switch (day) {
+    case 1:
+        printf("Monday\\n");
+        break; // EXIT the switch block
+    case 2:
+        printf("Tuesday\\n");
+        break;
+    case 3:
+        printf("Wednesday\\n");
+        break;
+    // ... other cases ...
+    default:  // Executes if no case matched
+        printf("Invalid day\\n");
 }`
         }
       ]
@@ -588,37 +788,44 @@ if (day == 6 || day == 7) {
       sections: [
         {
           id: "s5-1",
-          heading: "What is a Loop?",
+          heading: "Introduction to Loops & Iteration",
           type: "definition",
-          content: "Loops are used to execute a block of code repeatedly as long as a specified condition is met.",
+          content: "In programming, iteration is the process of repeating a sequence of instructions. Loops are control flow structures that execute a block of code repeatedly as long as a specified condition remains true.\n\nWithout loops, executing code multiple times would require redundant copy-pasting, making programs bulky and hard to maintain.",
         },
         {
           id: "s5-2",
-          heading: "The for Loop Syntax",
+          heading: "The for Loop Syntax & Execution Flow",
           type: "syntax",
-          content: "A `for` loop contains three parts: initialization, condition, and update (increment/decrement).",
+          content: "The `for` loop is ideal when you know in advance how many times the loop should iterate. It encapsulates initialization, conditional check, and variable update into a single line.\n\nHere is the detailed step-by-step execution path of a `for` loop:",
+          flowchart: "loop",
           code: `for (initialization; condition; update) {
-    // Code to execute
+    // Loop Body (statements to repeat)
 }`
         },
         {
           id: "s5-3",
-          heading: "Simple Counting Example",
+          heading: "Standard Counting Loop",
           type: "example",
-          content: "Printing numbers from 1 to 5.",
+          content: "Printing numbers from 1 to 5. The loop variable `i` starts at 1, increments by 1 in each cycle, and terminates once `i` becomes 6.",
           code: `for (int i = 1; i <= 5; i++) {
     printf("%d ", i);
 }
+// Step 1: i is initialized to 1
+// Step 2: Checks if 1 <= 5 (True)
+// Step 3: Prints "1 "
+// Step 4: i is updated to 2
+// ... repeats until i = 6, which fails the condition (6 <= 5 is False)
 // Output: 1 2 3 4 5`
         },
         {
           id: "s5-4",
-          heading: "Decrementing (Counting Down)",
+          heading: "Counting Down (Decrementing)",
           type: "example",
-          content: "You can use `i--` to count backwards.",
+          content: "You can count backwards by initializing to a higher value, checking with a greater-than condition, and using decrement operators (`i--` or `i -= 1`).",
           code: `for (int i = 5; i > 0; i--) {
     printf("%d ", i);
 }
+// Starts at 5, counts down to 1, terminates when i becomes 0
 // Output: 5 4 3 2 1`
         }
       ]
