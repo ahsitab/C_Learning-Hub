@@ -16,14 +16,18 @@ export default function TopicPage({ topics, progressApi }) {
   const location = useLocation();
   const topic = getTopicBySlug(slug);
 
-  const initialTab = location.state?.tab || "theory";
+  const availableTabs = topic.theory?.sections?.length > 0
+    ? TABS
+    : TABS.filter((t) => t.id === "problems");
+
+  const initialTab = location.state?.tab || availableTabs[0].id;
   const [activeTab, setActiveTab] = useState(initialTab);
 
   // Reset tab when topic changes
   useEffect(() => {
-    setActiveTab(location.state?.tab || "theory");
+    setActiveTab(location.state?.tab || (topic.theory?.sections?.length > 0 ? "theory" : "problems"));
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [slug, location.state?.tab]);
+  }, [slug, location.state?.tab, topic.theory?.sections?.length]);
 
   if (!topic) {
     return (
@@ -105,9 +109,8 @@ export default function TopicPage({ topics, progressApi }) {
         </div>
       </header>
 
-      {/* Tab switcher */}
       <div className="mb-8">
-        <TabSwitcher tabs={TABS} activeTab={activeTab} onChange={setActiveTab} />
+        <TabSwitcher tabs={availableTabs} activeTab={activeTab} onChange={setActiveTab} />
       </div>
 
       {/* Tab content */}
