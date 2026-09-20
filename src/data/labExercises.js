@@ -1106,5 +1106,235 @@ int main() {
         difficulty: "Medium"
       }
     ]
+  },
+  {
+    id: "while-loop",
+    title: "While Loop Lab",
+    description: "Master the while loop in C — from simple counting and arithmetic to advanced number theory problems like perfect numbers and palindromes.",
+    problems: [
+      {
+        id: "while-1",
+        title: "Display 1 to 20",
+        statement: "Write a program that displays all the positive numbers from 1 to 20.",
+        explanation: "We initialize a counter variable i to 1. The while loop runs as long as i <= 20. Inside the loop, we print i then increment it. This is the classic counting loop pattern.",
+        solution: `#include <stdio.h>
+
+int main() {
+    int i = 1;
+
+    // Loop while i is less than or equal to 20
+    while (i <= 20) {
+        printf("%d ", i);
+        i++; // Increment counter
+    }
+    printf("\\n");
+
+    return 0;
+}`,
+        sampleInput: "(no input)",
+        sampleOutput: "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20",
+        difficulty: "Easy"
+      },
+      {
+        id: "while-2",
+        title: "Display 20 to 1 (Reverse)",
+        statement: "Write a program that displays all the positive numbers from 1 to 20 in reverse order.",
+        explanation: "We start the counter at 20 and decrement it each iteration. The while loop runs while i >= 1, printing each value from 20 down to 1.",
+        solution: `#include <stdio.h>
+
+int main() {
+    int i = 20;
+
+    // Loop while i is greater than or equal to 1
+    while (i >= 1) {
+        printf("%d ", i);
+        i--; // Decrement counter
+    }
+    printf("\\n");
+
+    return 0;
+}`,
+        sampleInput: "(no input)",
+        sampleOutput: "20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1",
+        difficulty: "Easy"
+      },
+      {
+        id: "while-3",
+        title: "Sum of First 10 Positive Numbers",
+        statement: "Write a program that computes the sum of the first 10 positive numbers.",
+        explanation: "We use a counter i (1 to 10) and accumulate the sum in a variable. The formula gives 1+2+...+10 = 55. The while loop adds each i to sum and increments i until i exceeds 10.",
+        solution: `#include <stdio.h>
+
+int main() {
+    int i = 1;
+    int sum = 0;
+
+    // Add each number from 1 to 10 into sum
+    while (i <= 10) {
+        sum += i; // sum = sum + i
+        i++;
+    }
+
+    printf("%d\\n", sum);
+
+    return 0;
+}`,
+        sampleInput: "(no input)",
+        sampleOutput: "55",
+        difficulty: "Easy"
+      },
+      {
+        id: "while-4",
+        title: "Factorial of a Number",
+        statement: "Write a program that takes an integer number from the keyboard and displays its factorial.",
+        explanation: "Factorial of n is n! = 1 × 2 × 3 × ... × n. We initialize result = 1 and multiply it by each integer from 1 up to n using a while loop. Special case: 0! = 1 (handled since loop doesn't execute). Note: for large inputs like 23, the result overflows a 32-bit int — an unsigned long long is used here to hold larger values.",
+        solution: `#include <stdio.h>
+
+int main() {
+    int n;
+    unsigned long long factorial = 1;
+
+    printf("Enter an integer number: ");
+    scanf("%d", &n);
+
+    int i = 1;
+
+    // Multiply 1 * 2 * 3 * ... * n
+    while (i <= n) {
+        factorial *= i;
+        i++;
+    }
+
+    printf("Factorial is %llu\\n", factorial);
+
+    return 0;
+}`,
+        sampleInput: "Enter an integer number: 10",
+        sampleOutput: "Factorial is 3628800",
+        difficulty: "Easy"
+      },
+      {
+        id: "while-5",
+        title: "Power Without Math Functions",
+        statement: "Two numbers are entered through the keyboard. Write a program to find the value of the first number (base) raised to the power of the second number (exponent) without using math functions.",
+        explanation: "We compute base^exponent by multiplying base by itself exponent times. We initialize result = 1 and multiply by base in each iteration of the while loop, running exactly exponent times. Special case: any number raised to 0 is 1 (loop doesn't execute, result stays 1).",
+        solution: `#include <stdio.h>
+
+int main() {
+    long long base, exponent, result = 1;
+
+    printf("Enter the value of base and exponent: ");
+    scanf("%lld %lld", &base, &exponent);
+
+    long long i = 0;
+
+    // Multiply base by itself exponent times
+    while (i < exponent) {
+        result *= base;
+        i++;
+    }
+
+    printf("Result is: %lld\\n", result);
+
+    return 0;
+}`,
+        sampleInput: "Enter the value of base and exponent: 5 3",
+        sampleOutput: "Result is: 125",
+        difficulty: "Medium"
+      },
+      {
+        id: "while-6",
+        title: "Print All ASCII Values",
+        statement: "Write a program to print all the ASCII values and their equivalent characters using a while loop. The ASCII values vary from 0 to 255.",
+        explanation: "Each integer from 0 to 255 corresponds to a printable (or control) ASCII character. We cast the integer to char using (char)i to display the character. The %d format specifier shows the integer value and %c shows its character equivalent.",
+        solution: `#include <stdio.h>
+
+int main() {
+    int i = 0;
+
+    // Iterate through all ASCII values from 0 to 255
+    while (i <= 255) {
+        printf("ASCII value = %d ASCII character = %c\\n", i, (char)i);
+        i++;
+    }
+
+    return 0;
+}`,
+        sampleInput: "(no input)",
+        sampleOutput: "ASCII value = 65 ASCII character = A\nASCII value = 66 ASCII character = B\n... (256 lines total)",
+        difficulty: "Easy"
+      },
+      {
+        id: "while-7",
+        title: "Perfect Number Checker",
+        statement: "Write a program that takes a number as input and checks if it is a perfect number. A perfect number is a positive integer equal to the sum of its positive divisors, excluding the number itself (e.g., 6 = 1+2+3).",
+        explanation: "We find all divisors of n by testing every integer from 1 to n-1. If i divides n evenly (n % i == 0), we add i to the sum. After the loop, if sum equals n, it is a perfect number. Known perfect numbers include 6, 28, 496, 8128.",
+        solution: `#include <stdio.h>
+
+int main() {
+    int n;
+
+    printf("Enter an integer number: ");
+    scanf("%d", &n);
+
+    int sum = 0;
+    int i = 1;
+
+    // Find all divisors of n (excluding n itself) and sum them
+    while (i < n) {
+        if (n % i == 0) {
+            sum += i; // i is a divisor
+        }
+        i++;
+    }
+
+    if (sum == n) {
+        printf("%d is a perfect number\\n", n);
+    } else {
+        printf("%d is not a perfect number\\n", n);
+    }
+
+    return 0;
+}`,
+        sampleInput: "Enter an integer number: 8128",
+        sampleOutput: "8128 is a perfect number",
+        difficulty: "Medium"
+      },
+      {
+        id: "while-8",
+        title: "Palindrome Number Checker",
+        statement: "Write a program to take an integer from the keyboard and determine if it is a palindrome or not. An integer is a palindrome if the reverse of that number is equal to the original number (e.g., 1001 is a palindrome).",
+        explanation: "To reverse a number, we repeatedly extract the last digit using (n % 10) and build the reversed number by shifting left (reversed = reversed * 10 + digit), then remove the last digit (n /= 10). We compare the reversed number with the original. Single-digit numbers are always palindromes.",
+        solution: `#include <stdio.h>
+
+int main() {
+    int n;
+
+    printf("Enter an integer number: ");
+    scanf("%d", &n);
+
+    int original = n;
+    int reversed = 0;
+
+    // Reverse the number digit by digit
+    while (n > 0) {
+        int digit = n % 10;          // Extract last digit
+        reversed = reversed * 10 + digit; // Append to reversed
+        n /= 10;                     // Remove last digit
+    }
+
+    if (original == reversed) {
+        printf("%d is a palindrome number.\\n", original);
+    } else {
+        printf("%d is not a palindrome number.\\n", original);
+    }
+
+    return 0;
+}`,
+        sampleInput: "Enter an integer number: 8118",
+        sampleOutput: "8118 is a palindrome number.",
+        difficulty: "Medium"
+      }
+    ]
   }
 ];
