@@ -1106,5 +1106,435 @@ int main() {
         difficulty: "Medium"
       }
     ]
+  },
+  {
+    id: "nested-loop",
+    title: "Nested Loop Lab",
+    description: "Master nested loops in C — print patterns, compute series, find prime and perfect numbers, and sort arrays using inner and outer loop combinations.",
+    problems: [
+      {
+        id: "nested-1",
+        title: "Triangle of A's",
+        statement: "Write a C program that will show the following output. Solve using a nested for loop AND a nested while loop.\nA\nAA\nAAA\nAAAA\nAAAAA",
+        explanation: "The outer loop controls the row number (1 to 5). The inner loop prints 'A' exactly (row number) times on each row. We show both the for-loop version and the while-loop version in one program using a separator.",
+        solution: `#include <stdio.h>
+
+int main() {
+    int i, j;
+
+    printf("--- Using nested FOR loop ---\\n");
+    // Outer loop: rows 1 to 5
+    for (i = 1; i <= 5; i++) {
+        // Inner loop: print 'A' exactly i times
+        for (j = 1; j <= i; j++) {
+            printf("A");
+        }
+        printf("\\n"); // Move to next row
+    }
+
+    printf("\\n--- Using nested WHILE loop ---\\n");
+    i = 1;
+    while (i <= 5) {
+        j = 1;
+        while (j <= i) {
+            printf("A");
+            j++;
+        }
+        printf("\\n");
+        i++;
+    }
+
+    return 0;
+}`,
+        sampleInput: "(no input)",
+        sampleOutput: "A\nAA\nAAA\nAAAA\nAAAAA",
+        difficulty: "Easy"
+      },
+      {
+        id: "nested-2",
+        title: "Number Triangle for Input N",
+        statement: "Write a C program that will show a number triangle for input N. Solve using a nested for loop AND a nested while loop.\nInput: a single number N.\nOutput: A triangle of numbers where each row r prints digits 1 through r.\nExample for N=5:\n1\n12\n123\n1234\n12345",
+        explanation: "The outer loop runs from row 1 to N (determines the current row). The inner loop runs from 1 to the current row number, printing each column digit. After each row, print a newline. Both for-loop and while-loop solutions are shown.",
+        solution: `#include <stdio.h>
+
+int main() {
+    int n, i, j;
+
+    printf("Enter N: ");
+    scanf("%d", &n);
+
+    printf("--- Using nested FOR loop ---\\n");
+    // Outer loop: iterate over rows 1 to N
+    for (i = 1; i <= n; i++) {
+        // Inner loop: print digits 1 to i
+        for (j = 1; j <= i; j++) {
+            printf("%d", j);
+        }
+        printf("\\n");
+    }
+
+    printf("\\n--- Using nested WHILE loop ---\\n");
+    i = 1;
+    while (i <= n) {
+        j = 1;
+        while (j <= i) {
+            printf("%d", j);
+            j++;
+        }
+        printf("\\n");
+        i++;
+    }
+
+    return 0;
+}`,
+        sampleInput: "Enter N: 5",
+        sampleOutput: "1\n12\n123\n1234\n12345",
+        difficulty: "Easy"
+      },
+      {
+        id: "nested-3",
+        title: "Sum of Factorial Series (1! to 7!)",
+        statement: "Write a C program that will find the sum of the following series: 1! + 2! + 3! + 4! + 5! + 6! + 7!",
+        explanation: "We use nested loops: the outer loop iterates i from 1 to 7, and the inner loop computes i! (factorial of i) by multiplying 1×2×...×i. We accumulate each factorial into the total sum. Answer: 1+2+6+24+120+720+5040 = 5913.",
+        solution: `#include <stdio.h>
+
+int main() {
+    long long sum = 0;
+    int i, j;
+
+    // Outer loop: each term i! from 1! to 7!
+    for (i = 1; i <= 7; i++) {
+        long long factorial = 1;
+
+        // Inner loop: compute i! = 1 * 2 * ... * i
+        for (j = 1; j <= i; j++) {
+            factorial *= j;
+        }
+
+        printf("%d! = %lld\\n", i, factorial);
+        sum += factorial;
+    }
+
+    printf("\\nSum = 1! + 2! + 3! + 4! + 5! + 6! + 7! = %lld\\n", sum);
+
+    return 0;
+}`,
+        sampleInput: "(no input)",
+        sampleOutput: "1! = 1\n2! = 2\n3! = 6\n4! = 24\n5! = 120\n6! = 720\n7! = 5040\n\nSum = 1! + 2! + 3! + 4! + 5! + 6! + 7! = 5913",
+        difficulty: "Medium"
+      },
+      {
+        id: "nested-4",
+        title: "Sum of Factorial Series for Input N",
+        statement: "Write a C program that will find the sum of the series 1! + 2! + 3! + ... + N! for a user-provided input N.",
+        explanation: "The outer loop iterates i from 1 to N. The inner loop computes i! by multiplying numbers from 1 to i. Each factorial is added to the running sum. For large N, unsigned long long is used to avoid integer overflow.",
+        solution: `#include <stdio.h>
+
+int main() {
+    int n;
+    printf("Enter N: ");
+    scanf("%d", &n);
+
+    unsigned long long sum = 0;
+    int i, j;
+
+    // Outer loop: term i from 1 to N
+    for (i = 1; i <= n; i++) {
+        unsigned long long factorial = 1;
+
+        // Inner loop: compute factorial of i
+        for (j = 1; j <= i; j++) {
+            factorial *= j;
+        }
+
+        sum += factorial;
+    }
+
+    printf("Sum of 1! + 2! + ... + %d! = %llu\\n", n, sum);
+
+    return 0;
+}`,
+        sampleInput: "Enter N: 7",
+        sampleOutput: "Sum of 1! + 2! + ... + 7! = 5913",
+        difficulty: "Medium"
+      },
+      {
+        id: "nested-5",
+        title: "All Perfect Numbers from 10 to 1000",
+        statement: "Write a C program that shows all the perfect numbers from 10 to 1000. A perfect number equals the sum of its divisors (excluding itself).",
+        explanation: "The outer loop tests each number n from 10 to 1000. The inner loop finds all divisors of n from 1 to n-1 and sums them. If the sum equals n, it is perfect. Perfect numbers in this range are 28 and 496.",
+        solution: `#include <stdio.h>
+
+int main() {
+    int n, i, sum;
+
+    printf("Perfect numbers between 10 and 1000:\\n");
+
+    // Outer loop: test each candidate number
+    for (n = 10; n <= 1000; n++) {
+        sum = 0;
+
+        // Inner loop: find all proper divisors of n
+        for (i = 1; i < n; i++) {
+            if (n % i == 0) {
+                sum += i; // i is a divisor
+            }
+        }
+
+        // If sum of divisors equals the number, it is perfect
+        if (sum == n) {
+            printf("%d is a perfect number\\n", n);
+        }
+    }
+
+    return 0;
+}`,
+        sampleInput: "(no input)",
+        sampleOutput: "Perfect numbers between 10 and 1000:\n28 is a perfect number\n496 is a perfect number",
+        difficulty: "Medium"
+      },
+      {
+        id: "nested-6",
+        title: "All Prime Numbers from 100 to 200",
+        statement: "Write a C program that shows all the prime numbers from 100 to 200.",
+        explanation: "The outer loop tests each candidate number n from 100 to 200. The inner loop checks for any divisor from 2 up to sqrt(n) — if a divisor is found, n is not prime. We use a flag isPrime to track the result. Primes found: 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199.",
+        solution: `#include <stdio.h>
+
+int main() {
+    int n, i, isPrime;
+
+    printf("Prime numbers between 100 and 200:\\n");
+
+    // Outer loop: test each candidate number
+    for (n = 100; n <= 200; n++) {
+        isPrime = 1; // Assume prime until proven otherwise
+
+        // Inner loop: check for divisors from 2 to sqrt(n)
+        for (i = 2; i * i <= n; i++) {
+            if (n % i == 0) {
+                isPrime = 0; // Divisor found, not prime
+                break;
+            }
+        }
+
+        // 1 is not prime; also n must be >= 2
+        if (n < 2) isPrime = 0;
+
+        if (isPrime) {
+            printf("%d ", n);
+        }
+    }
+    printf("\\n");
+
+    return 0;
+}`,
+        sampleInput: "(no input)",
+        sampleOutput: "101 103 107 109 113 127 131 137 139 149 151 157 163 167 173 179 181 191 193 197 199",
+        difficulty: "Medium"
+      },
+      {
+        id: "nested-7",
+        title: "Factorial Table (1! to 20!)",
+        statement: "Write a C program that shows the factorials of the numbers 1 to 20 in a formatted table.",
+        explanation: "We iterate i from 1 to 20 (outer loop). For each i, the inner loop computes i! by multiplying 1×2×...×i. Because 20! is an astronomically large number (2,432,902,008,176,640,000), we use unsigned long long (max ~1.8×10^19) which can hold up to 20! exactly.",
+        solution: `#include <stdio.h>
+
+int main() {
+    int i, j;
+    unsigned long long factorial;
+
+    printf("%-5s %s\\n", "N", "N!");
+    printf("-----------------------------------\\n");
+
+    // Outer loop: n from 1 to 20
+    for (i = 1; i <= 20; i++) {
+        factorial = 1;
+
+        // Inner loop: compute i!
+        for (j = 1; j <= i; j++) {
+            factorial *= j;
+        }
+
+        printf("%-5d %llu\\n", i, factorial);
+    }
+
+    return 0;
+}`,
+        sampleInput: "(no input)",
+        sampleOutput: "N     N!\n-----------------------------------\n1     1\n2     2\n3     6\n4     24\n5     120\n...\n20    2432902008176640000",
+        difficulty: "Easy"
+      },
+      {
+        id: "nested-8",
+        title: "Diagonal Asterisk Pattern (4×4 Grid)",
+        statement: "Write a C program to display the following diagonal asterisk pattern using nested loops. Stars appear only along the main diagonal of a 4×4 grid (where row index equals column index).\n*\n *\n  *\n   *",
+        explanation: "We use two nested loops for a 4×4 grid. For each row i (0 to 3), the inner loop prints spaces for columns 0 to i-1, then prints a '*' at position i (where row == column), then a newline. This produces a diagonal pattern where each star is one position further right than the previous row.",
+        solution: `#include <stdio.h>
+
+int main() {
+    int i, j;
+
+    printf("--- Diagonal Pattern (4x4 grid) ---\\n");
+
+    // Outer loop: 4 rows
+    for (i = 0; i < 4; i++) {
+        // Inner loop: print spaces before the star
+        for (j = 0; j < i; j++) {
+            printf(" ");
+        }
+        printf("*\\n"); // Star at diagonal position
+    }
+
+    printf("\\n--- Same pattern using WHILE loop ---\\n");
+    i = 0;
+    while (i < 4) {
+        j = 0;
+        while (j < i) {
+            printf(" ");
+            j++;
+        }
+        printf("*\\n");
+        i++;
+    }
+
+    return 0;
+}`,
+        sampleInput: "(no input)",
+        sampleOutput: "*\n *\n  *\n   *",
+        difficulty: "Medium"
+      },
+      {
+        id: "nested-9",
+        title: "Prime Numbers from an Array of 5",
+        statement: "Write a C program that takes 5 integers from the keyboard into an array, then displays all the prime numbers from the array using nested loops.",
+        explanation: "The outer loop iterates over each element in the array. The inner loop tests if the current element has any divisor from 2 to sqrt(element). If no divisor is found, it is prime. We must also handle the special case where the number is less than 2 (not prime).",
+        solution: `#include <stdio.h>
+
+int main() {
+    int arr[5], i, j, isPrime;
+
+    printf("Enter 5 integers: ");
+    for (i = 0; i < 5; i++) {
+        scanf("%d", &arr[i]);
+    }
+
+    printf("Prime numbers in the array: ");
+
+    // Outer loop: check each element of the array
+    for (i = 0; i < 5; i++) {
+        isPrime = 1;
+
+        if (arr[i] < 2) {
+            isPrime = 0; // Numbers less than 2 are not prime
+        }
+
+        // Inner loop: check divisibility from 2 to sqrt(arr[i])
+        for (j = 2; j * j <= arr[i]; j++) {
+            if (arr[i] % j == 0) {
+                isPrime = 0; // Divisor found
+                break;
+            }
+        }
+
+        if (isPrime) {
+            printf("%d ", arr[i]);
+        }
+    }
+    printf("\\n");
+
+    return 0;
+}`,
+        sampleInput: "Enter 5 integers: 3 8 11 15 7",
+        sampleOutput: "Prime numbers in the array: 3 11 7",
+        difficulty: "Medium"
+      },
+      {
+        id: "nested-10",
+        title: "Sort 10 Floats in Ascending Order",
+        statement: "Write a program that takes 10 floating values from the keyboard into an array, sorts them in ascending order using nested loops (Bubble Sort), then displays the sorted array.",
+        explanation: "Bubble Sort uses two nested loops. The outer loop runs n-1 times (passes). The inner loop compares adjacent elements — if the left is greater than the right, it swaps them. After each pass, the largest unsorted element 'bubbles up' to its correct position. After n-1 passes, the entire array is sorted.",
+        solution: `#include <stdio.h>
+
+int main() {
+    float arr[10];
+    int i, j;
+    float temp;
+
+    printf("Enter 10 floating-point values:\\n");
+    for (i = 0; i < 10; i++) {
+        printf("Value %d: ", i + 1);
+        scanf("%f", &arr[i]);
+    }
+
+    // Bubble Sort — Ascending Order
+    // Outer loop: n-1 passes through the array
+    for (i = 0; i < 9; i++) {
+        // Inner loop: compare adjacent pairs
+        for (j = 0; j < 9 - i; j++) {
+            if (arr[j] > arr[j + 1]) {
+                // Swap arr[j] and arr[j+1]
+                temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+        }
+    }
+
+    printf("\\nSorted array (Ascending):\\n");
+    for (i = 0; i < 10; i++) {
+        printf("%.2f ", arr[i]);
+    }
+    printf("\\n");
+
+    return 0;
+}`,
+        sampleInput: "10 values: 3.5 1.2 9.8 4.4 2.1 7.7 5.5 8.8 0.3 6.6",
+        sampleOutput: "Sorted array (Ascending):\n0.30 1.20 2.10 3.50 4.40 5.50 6.60 7.70 8.80 9.80",
+        difficulty: "Hard"
+      },
+      {
+        id: "nested-11",
+        title: "Sort 10 Integers in Descending Order",
+        statement: "Write a program that takes 10 integer values from the keyboard into an array, sorts them in descending order using nested loops (Bubble Sort), then displays the sorted array.",
+        explanation: "This is Bubble Sort adapted for descending order. The only change from ascending sort is the comparison: instead of swapping when arr[j] > arr[j+1], we swap when arr[j] < arr[j+1]. This causes the smallest elements to bubble to the end and the largest to the front.",
+        solution: `#include <stdio.h>
+
+int main() {
+    int arr[10];
+    int i, j, temp;
+
+    printf("Enter 10 integer values:\\n");
+    for (i = 0; i < 10; i++) {
+        printf("Value %d: ", i + 1);
+        scanf("%d", &arr[i]);
+    }
+
+    // Bubble Sort — Descending Order
+    // Outer loop: n-1 passes
+    for (i = 0; i < 9; i++) {
+        // Inner loop: compare adjacent pairs
+        for (j = 0; j < 9 - i; j++) {
+            if (arr[j] < arr[j + 1]) {
+                // Swap: smaller element moves right
+                temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+        }
+    }
+
+    printf("\\nSorted array (Descending):\\n");
+    for (i = 0; i < 10; i++) {
+        printf("%d ", arr[i]);
+    }
+    printf("\\n");
+
+    return 0;
+}`,
+        sampleInput: "10 values: 34 7 23 32 5 62 78 1 88 23",
+        sampleOutput: "Sorted array (Descending):\n88 78 62 34 32 23 23 7 5 1",
+        difficulty: "Hard"
+      }
+    ]
   }
 ];
